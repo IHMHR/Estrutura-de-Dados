@@ -65,18 +65,35 @@ int main() {
 				    string.substring(u->endereco, numero, string.firstIndexOf(u->endereco, ','), string.length(u->endereco));
 					printf("Número da casa: %s \n", numero);
 				}
+				
 			} else if(op == 2) {
 				// Mostrar ano de nascimento
+				char ano[5];
+				for (i = 0; i < users; i++){
+					string.substring(u->dataNascimento, ano, string.firsIndexOf(u->dataNascimento, '/'), string.length(u->dataNascimento));
+					printf("Ano de nascimento: %s \n", ano);
+				}
+				
 			} else if(op == 3) {
 				// Mostrar mes de nascimento
+				
 			} else if(op == 4) {
 				// Mostrar dia de nascimento
+				
 			} else if(op == 5) {
 				// Mostrar ultimo nome
+				char ultimoNome[20];
+				for(i = 0; i < users; i++){
+					string.substring(u->nome, ultimoNome, string.firstIndexOf(u->nome, ' '), string.length(u->nome));
+					printf("Último sobrenome: ");
+				}
+				
 			} else if(op == 6) {
 				// Mostrar primeiro nome
+				
 			} else if(op == 7) {
 				// Mostrar os nome do meio
+				
 			} else {
 				exit(0);
 			}
@@ -101,8 +118,36 @@ int main() {
 				}
 			} else if(op == 2) {
 				// Pesquisa pelo sobrenome
+				printf("Informe o sobrenome para pesquisa: ");
+				fflush(stdin);
+				char sobrenomePesquisa[20];
+				gets(sobrenomePesqusia);
+				
+				char sobrenome[20];
+				for (i = 0; i < users; i++){
+					string.substring(u->nome, sobrenome, string.firstIndexOf(u->nome, ' '), string.lenght(u->nome));
+					if(string.equals(sobrenomePesquisa, sobrenome) == 1){
+						printf("\nNome do Usuário %s: ", u->nome);		
+						printf("\nEndereço do Usuário %s: ", u->endereco);		
+						printf("\nData de nascimento do Usuário %s: ", u->dataNascimento);
+					}
+				}
 			} else if(op == 3) {
 				// Pesquisa pelo ano de nascimento
+				printf("Informe o ano de nascimento para pesquisa: ");
+				fflush(stdin);
+				char anoPesquisa[5];
+				gets (anoPesquisa);
+				
+				char ano[5]/
+				for (i = 0; i < users; i++){
+					string.substring(u->dataNascimento, ano, string.firstIndexOf(u->dataNascimento, '/'), string.lenght(u->dataNascimento));
+					if(string.equals(anoPesquisa, ano) == 1){
+						printf("\nNome do Usuário %s: ", u->nome);		
+						printf("\nEndereço do Usuário %s: ", u->endereco);		
+						printf("\nData de nascimento do Usuário %s: ", u->dataNascimento);
+					}
+				}
 			} else if(op == 4) {
 				// Pesquisa pelo mes de nascimento
 			} else {
