@@ -55,44 +55,73 @@ int main() {
 	
 	int op = MenuPrincipal();
 	
+	system("cls");
+	
 	switch(op) {
 		case 1:
 			op = Menu1();
 			if(op == 1) {
 				// Mostrar número da casa
 				char numero[5];
+				system("cls");
 				for(i = 0; i < users; i++) {
 				    string.substring(u->endereco, numero, string.firstIndexOf(u->endereco, ','), string.length(u->endereco));
-					printf("Número da casa: %s \n", numero);
+					printf("Número da casa do usuário %d: %s \n", i+1, numero);
 				}
 				
 			} else if(op == 2) {
 				// Mostrar ano de nascimento
 				char ano[5];
-				for (i = 0; i < users; i++){
-					string.substring(u->dataNascimento, ano, string.firsIndexOf(u->dataNascimento, '/'), string.length(u->dataNascimento));
-					printf("Ano de nascimento: %s \n", ano);
+				system("cls");
+				for(i = 0; i < users; i++) {
+				    string.substring(u->dataNascimento, ano, string.lastIndexOf(u->dataNascimento, '/'), string.length(u->dataNascimento));
+					printf("Ano de nascimento do usuário %d: %s \n", i+1, ano);
 				}
 				
 			} else if(op == 3) {
 				// Mostrar mes de nascimento
+				char mes[3];
+				system("cls");
+				for(i = 0; i < users; i++) {
+				    string.substring(u->dataNascimento, mes, string.firstIndexOf(u->dataNascimento, '/'), string.length(u->dataNascimento));
+					printf("Mês de nascimento do usuário %d: %s \n", i+1, mes);
+				}
 				
 			} else if(op == 4) {
 				// Mostrar dia de nascimento
+				char dia[3];
+				system("cls");
+				for(i = 0; i < users; i++) {
+				    string.substring(u->dataNascimento, dia, string.lastIndexOf(u->dataNascimento, '/'), string.length(u->dataNascimento));
+					printf("Ano de nascimento do usuário %d: %s \n", i+1, dia);
+				}
 				
 			} else if(op == 5) {
 				// Mostrar ultimo nome
 				char ultimoNome[20];
+				system("cls");
 				for(i = 0; i < users; i++){
-					string.substring(u->nome, ultimoNome, string.firstIndexOf(u->nome, ' '), string.length(u->nome));
-					printf("Último sobrenome: ");
+					string.substring(u->nome, ultimoNome, string.lastIndexOf(u->nome, ' '), string.length(u->nome));
+					printf("Último sobrenome do usuário %d: %s \n", i+1, ultimoNome);
 				}
 				
 			} else if(op == 6) {
 				// Mostrar primeiro nome
+				char primeiroNome[20];
+				system("cls");
+				for(i = 0; i < users; i++){
+					string.substring(u->nome, primeiroNome, string.firstIndexOf(u->nome, ' '), string.length(u->nome));
+					printf("Primeiro nome do usuário %d: %s \n", i+1, primeiroNome);
+				}
 				
 			} else if(op == 7) {
 				// Mostrar os nome do meio
+				char meioNome[20];
+				system("cls");
+				for(i = 0; i < users; i++){
+					string.substring(u->nome, meioNome, string.firstIndexOf(u->nome, ' '), string.length(u->nome));
+					printf("Nome(s) do meio do usuário %d: %s \n", i+1, meioNome);
+				}
 				
 			} else {
 				exit(0);
@@ -121,35 +150,52 @@ int main() {
 				printf("Informe o sobrenome para pesquisa: ");
 				fflush(stdin);
 				char sobrenomePesquisa[20];
-				gets(sobrenomePesqusia);
-				
+				gets(sobrenomePesquisa);
+			
 				char sobrenome[20];
-				for (i = 0; i < users; i++){
-					string.substring(u->nome, sobrenome, string.firstIndexOf(u->nome, ' '), string.lenght(u->nome));
-					if(string.equals(sobrenomePesquisa, sobrenome) == 1){
+				for(i = 0; i < users; i++) {
+				    string.substring(u->nome, sobrenome, string.lastIndexOf(u->nome, ' '), string.length(u->nome));
+					if(string.equals(sobrenomePesquisa,sobrenome) == 1){
 						printf("\nNome do Usuário %s: ", u->nome);		
 						printf("\nEndereço do Usuário %s: ", u->endereco);		
-						printf("\nData de nascimento do Usuário %s: ", u->dataNascimento);
+						printf("\nData de nascimento do Usuário %s: ", u->dataNascimento);			
 					}
 				}
+		
 			} else if(op == 3) {
 				// Pesquisa pelo ano de nascimento
-				printf("Informe o ano de nascimento para pesquisa: ");
+				printf("Informe o ano para pesquisa: ");
 				fflush(stdin);
 				char anoPesquisa[5];
-				gets (anoPesquisa);
+				gets(anoPesquisa);
 				
-				char ano[5]/
-				for (i = 0; i < users; i++){
-					string.substring(u->dataNascimento, ano, string.firstIndexOf(u->dataNascimento, '/'), string.lenght(u->dataNascimento));
-					if(string.equals(anoPesquisa, ano) == 1){
+				char ano[5];
+				for(i = 0; i < users; i++) {
+				    string.substring(u->dataNascimento, ano, string.lastIndexOf(u->dataNascimento, '/'), string.length(u->dataNascimento));
+					if(string.equals(anoPesquisa,ano) == 1){
 						printf("\nNome do Usuário %s: ", u->nome);		
 						printf("\nEndereço do Usuário %s: ", u->endereco);		
-						printf("\nData de nascimento do Usuário %s: ", u->dataNascimento);
+						printf("\nData de nascimento do Usuário %s: ", u->dataNascimento);			
 					}
 				}
+				
 			} else if(op == 4) {
 				// Pesquisa pelo mes de nascimento
+				printf("Informe o mês para pesquisa: ");
+				fflush(stdin);
+				char mesPesquisa[3];
+				gets(mesPesquisa);
+				
+				char mes[3];
+				for(i = 0; i < users; i++) {
+				    string.substring(u->dataNascimento, mes, string.firstIndexOf(u->dataNascimento, '/'), string.length(u->dataNascimento));
+					if(string.equals(mesPesquisa,mes) == 1){
+						printf("\nNome do Usuário %s: ", u->nome);		
+						printf("\nEndereço do Usuário %s: ", u->endereco);		
+						printf("\nData de nascimento do Usuário %s: ", u->dataNascimento);			
+					}
+				}
+				
 			} else {
 				exit(0);
 			}
