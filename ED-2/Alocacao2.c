@@ -131,19 +131,19 @@ Tlista *LiberaLista(Tlista *lst)
 
 Tlista *Circular(Tlista *lst)
 {
-	Tlista *auxUltimo = lst;
-	while(!isListaVazia(auxUltimo->prox))
+	Tlista *aux = lst;
+	while(!isListaVazia(aux->prox))
 	{
-		auxUltimo = auxUltimo->prox;
+		aux = aux->prox;
 	}
-	auxUltimo->prox = lst;
+	aux->prox = lst;
 
-	return auxUltimo;
+	return lst;
 }
 
 Tlista *LiberarCaracterQualquer(Tlista *lst, char letra)
 {
-	Tlista *prox = NULL;
+	/*Tlista *prox = NULL;
 	Tlista *ant = NULL;
 	Tlista *aux = lst;
 	while(!isListaVazia(aux))
@@ -158,7 +158,34 @@ printf("|%c|", ant->dado);
 printf("|%c|", prox->dado);
 	free(aux);
 	ant->prox = prox;
-	return ant;
+	return ant;*/
+
+	Tlista *aux = lst;
+
+	if (aux->dado == letra)
+	{
+		lst = lst->prox;
+		free(aux);
+	}
+	else
+	{
+		while(NULL != aux->prox)
+		{
+			if(aux->prox->dado == letra)
+			{
+				Tlista *aux2 = aux->prox;
+
+				aux->prox = aux->prox->prox;
+				free(aux2);
+			}
+			else
+			{
+				aux = aux->prox;
+			}
+		}
+	}
+
+	return lst;
 }
 
 int main(void)
