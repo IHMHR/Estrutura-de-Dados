@@ -1,3 +1,13 @@
+/*
+ ============================================================================
+ Name        : ListaCircular.c
+ Author      : IHMHR
+ Version     :
+ Copyright   : Your copyright notice
+ Description : Hello World in C, Ansi-style
+ ============================================================================
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -9,180 +19,112 @@ struct lista
 	Tlista *prox;
 };
 
-int isListaVazia(Tlista *lst)
+int isListavazia(Tlista *lst)
 {
-	/*if(NULL == lst)
+	if(NULL == lst)
 	{
 		return 1;
 	}
 	else
 	{
 		return 0;
-	}*/
-
-	//return NULL == lst;
-
-	return !lst;
+	}
 }
 
-Tlista* preencher(Tlista *anterior, char letra)
+Tlista* inserir(Tlista *anterior, char letra)
 {
 	Tlista *aux = (Tlista*) malloc(sizeof(Tlista));
-	aux->dado = letra;
-	aux->prox = anterior;
-
-	return aux;
-}
-
-void imprime(Tlista *lista)
-{
-	/*printf("%c", lista->dado);
-	printf("%c", lista->prox->dado);
-	printf("%c", lista->prox->prox->dado);
-	printf("%c", lista->prox->prox->prox->dado);*/
-
-	//while(NULL != lista)
-	while(!isListaVazia(lista))
+	if(NULL == anterior)
 	{
-		printf("%c\n", lista->dado);
-		lista = lista->prox;
-	}
-}
-
-void imprimeRec(Tlista *lista)
-{
-	//if(NULL == lista->prox)
-	//if(NULL != lista)
-	if(!isListaVazia(lista))
-	{
-		imprimeRec(lista->prox);
-		printf("%c", lista->dado);
-	}
-}
-
-Tlista *buscaLetra(Tlista *lst, char letra)
-{
-	while(!isListaVazia(lst))
-	{
-		if (lst->dado == letra)
-		{
-			return lst;
-		}
-		lst = lst->prox;
-	}
-	return NULL;
-}
-
-int PertenceLista(Tlista *lst, char letra)
-{
-	while(!isListaVazia(lst))
-	{
-		if (lst->dado == letra)
-		{
-			return 1;
-		}
-		lst = lst->prox;
-	}
-	return 0;
-
-	//return (1 <= tam) || ((palavra[0] == palavra[tam - 1]) && palidromo(&palavra[1], tam - 2));
-	//return
-}
-
-int PertenceXulambs(Tlista *lst, char letra)
-{
-	return (NULL != lst) && ((lst->dado == letra) || PertenceXulambs(lst->prox, letra));
-}
-
-Tlista *RemoverInicio(Tlista *lst)
-{
-	/*Tlista *aux = lst;
-
-	lst = aux->prox;
-	free(aux);
-
-	return lst;*/
-
-	/*Tlista *aux = lst;
-
-	//lst = aux->prox;
-	lst = lst->prox;
-	free(aux);
-
-	return lst;*/
-
-	if (!isListaVazia(lst))
-	{
-		Tlista *aux = lst;
-		lst = lst->prox;
-		free(aux);
-	}
-	return lst;
-}
-
-Tlista *LiberaLista(Tlista *lst)
-{
-	while(!isListaVazia(lst))
-	{
-		lst = RemoverInicio(lst);
-	}
-	return lst;
-}
-
-Tlista *Circular(Tlista *lst)
-{
-	Tlista *aux = lst;
-	while(!isListaVazia(aux->prox))
-	{
-		aux = aux->prox;
-	}
-	aux->prox = lst;
-
-	return lst;
-}
-
-Tlista *LiberarCaracterQualquer(Tlista *lst, char letra)
-{
-	/*Tlista *prox = NULL;
-	Tlista *ant = NULL;
-	Tlista *aux = lst;
-	while(!isListaVazia(aux))
-	{
-		ant = aux;
-		if(letra == aux->dado)
-		{
-			prox = aux->prox;
-		}
-	}
-printf("|%c|", ant->dado);
-printf("|%c|", prox->dado);
-	free(aux);
-	ant->prox = prox;
-	return ant;*/
-
-	Tlista *aux = lst;
-
-	if (aux->dado == letra)
-	{
-		lst = lst->prox;
-		free(aux);
+		aux->dado = letra;
+		aux->prox = aux;
+		return aux;
 	}
 	else
 	{
-		while(NULL != aux->prox)
-		{
-			if(aux->prox->dado == letra)
-			{
-				Tlista *aux2 = aux->prox;
 
-				aux->prox = aux->prox->prox;
-				free(aux2);
-			}
-			else
+		Tlista *auxN = anterior;
+		aux->dado = letra;
+		aux->prox = aux;
+		aux->prox = anterior;
+
+		do {
+			auxN = auxN->prox;
+		} while (auxN->prox != anterior);
+
+		auxN->prox = aux;
+
+		return aux;
+
+
+		/*//dado
+		//ligação
+		do
+		{ // para no ultimo da lista
+			aux2 = anterior;
+			/*aux->dado = letra;
+			aux->prox = aux2;
+			aux2->prox = aux;*/
+		/*} while(aux2->prox != anterior);
+		//ultimo no primeiro
+		aux2->prox = anterior;
+		return anterior;*/
+	}
+}
+
+void imprime(Tlista *lst)
+{
+	if(NULL == lst)
+	{
+		printf("Lista vazia !");
+	}
+	else
+	{
+		Tlista *aux = lst;
+		do
+		{
+			printf("%c\n", lst->dado);
+			lst = lst->prox;
+		} while (aux != lst);
+	}
+}
+
+Tlista* BuscaCircular(Tlista* lst, char letra)
+{
+	if(isListavazia(lst))
+	{
+		return NULL; //return lst;
+	}
+	else
+	{
+		Tlista *aux = lst;
+		do
+		{
+			if(lst->dado == letra)
 			{
-				aux = aux->prox;
+				return lst;
 			}
-		}
+			lst = lst->prox;
+		} while (aux != lst);
+		return NULL;
+	}
+}
+
+Tlista* liberaCircular(Tlista *lst)
+{
+	while(!isListavazia(lst))
+	{
+		Tlista *aux = lst;
+		Tlista *aux2 = lst;
+		lst = lst->prox;
+
+		do
+		{
+			aux2 = aux2->prox;
+		} while (aux != aux2->prox);
+
+		free(aux);
+		aux2->prox = lst;
 	}
 
 	return lst;
@@ -191,42 +133,21 @@ printf("|%c|", prox->dado);
 int main(void)
 {
 	Tlista *listaCompleta = NULL;
-	listaCompleta = preencher(listaCompleta, 'F');
-	listaCompleta = preencher(listaCompleta, 'A');
-	listaCompleta = preencher(listaCompleta, 'C');
-	listaCompleta = preencher(listaCompleta, 'E');
+	listaCompleta = inserir(listaCompleta, 'F');
+	listaCompleta = inserir(listaCompleta, 'A');
+	listaCompleta = inserir(listaCompleta, 'C');
+	listaCompleta = inserir(listaCompleta, 'E');
 
-	/*imprime(listaCompleta);
-	printf("\n");
-	imprimeRec(listaCompleta);
-	printf("\n");
-	printf("Valor Hexadecimal da letra: %p, letra: %c", buscaLetra(listaCompleta, 'F'), buscaLetra(listaCompleta, 'F')->dado);
-	printf("\n");
-	printf("%p", listaCompleta->prox->prox->prox);*/
-	/*printf("A na lista = %d", PertenceLista(listaCompleta, 'A'));
-	printf("\n");
-	printf("H na lista = %d", PertenceLista(listaCompleta, 'H'));
-	printf("\n");
-	imprimeRec(listaCompleta);
-	printf("\n");
-	listaCompleta = RemoverInicio(listaCompleta);
-	printf("Impressão lista SEM INICIO: \n");
-	imprimeRec(listaCompleta);
-	listaCompleta = LiberaLista(listaCompleta);
-	printf("\n");
-	printf("Impressão lista VAZIA: \n");
-	imprimeRec(listaCompleta);*/
-
-	/*printf("H na lista = %d", PertenceXulambs(listaCompleta, 'H'));
-	printf("\n");
-	printf("A na lista = %d", PertenceXulambs(listaCompleta, 'A'));*/
-
-	//printf("%c \n", Circular(listaCompleta));
-	/*Tlista *listaCircular = Circular(listaCompleta);
-	imprime(listaCircular);*/
-
-	listaCompleta = LiberarCaracterQualquer(listaCompleta, 'A');
 	imprime(listaCompleta);
+
+	printf("\n");
+
+	printf("%p", BuscaCircular(listaCompleta, 'A'));
+
+	printf("\n\n");
+
+	listaCompleta = liberaCircular(listaCompleta);
+	printf("%s", isListavazia(listaCompleta) ? "Lista Vazia" : "Lista CHEIA");
 
 	return 0;
 }
