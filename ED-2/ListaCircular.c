@@ -152,36 +152,59 @@ Tlista* liberaCircular(Tlista *lst)
 		free(aux);
 	}
 
-	return NULL; 
+	return NULL;
 }
 
-Tlista* Remover(Tlista *lst, char letra)
+Tlista* removeLista(Tlista *lst, char letra)
 {
 	if(isListavazia(lst))
 	{
 		return lst;
 	}
+	else if(lst == lst->prox && letra == lst->dado)
+	{
+		free(lst);
+		lst = NULL;
+		return lst;
+	}
 	else if(lst->dado == letra)
 	{
-		Tlista *aux = lst->prox;
-		free(lst);
-		return aux;
+		Tlista *aux = lst;
+		Tlista *aux2 = lst;
+
+		do
+		{
+			aux2 = aux2->prox;
+		} while(aux2->prox != lst);
+
+		lst = lst->prox;
+		aux2->prox = lst;
+
+		free(aux);
+		return lst;
 	}
 	else
 	{
-		Tlista *aux = lst->prox;
-		Tlista *aux2 = aux->prox;
-		while(aux->dado != letra)
+		Tlista *aux = lst;
+		Tlista *aux2;
+
+		do
 		{
-			aux = aux->prox;
-			aux2 = aux->prox;
-		}
-		
-		aux->prox = aux2->prox;
-		free(aux2);
+			if (aux->prox->dado == letra)
+			{
+				aux2 = aux->prox;
+				aux->prox = aux->prox->prox;
+				free(aux2);
+			}
+			else
+			{
+				aux = aux->prox;
+			}
+		} while (aux->prox != lst);
+
 		return lst;
 	}
-	
+
 	return lst;
 }
 
@@ -197,12 +220,16 @@ int main(void)
 
 	printf("\n");
 
-	printf("%p", BuscaCircular(listaCompleta, 'A'));
+	//printf("%p", BuscaCircular(listaCompleta, 'A'));
 
-	printf("\n\n");
+	//printf("\n\n");
 
-	listaCompleta = liberaCircular(listaCompleta);
-	printf("%s", isListavazia(listaCompleta) ? "Lista Vazia" : "Lista CHEIA");
+	/*listaCompleta = liberaCircular(listaCompleta);*/
+	listaCompleta = removeLista(listaCompleta, 'C');
+	imprime(listaCompleta);
+	//printf("%s", isListavazia(listaCompleta) ? "Lista Vazia" : "Lista CHEIA");
+
+
 
 	return 0;
 }
