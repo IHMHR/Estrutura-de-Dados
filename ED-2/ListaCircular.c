@@ -152,7 +152,37 @@ Tlista* liberaCircular(Tlista *lst)
 		free(aux);
 	}
 
-	return NULL;
+	return NULL; 
+}
+
+Tlista* Remover(Tlista *lst, char letra)
+{
+	if(isListavazia(lst))
+	{
+		return lst;
+	}
+	else if(lst->dado == letra)
+	{
+		Tlista *aux = lst->prox;
+		free(lst);
+		return aux;
+	}
+	else
+	{
+		Tlista *aux = lst->prox;
+		Tlista *aux2 = aux->prox;
+		while(aux->dado != letra)
+		{
+			aux = aux->prox;
+			aux2 = aux->prox;
+		}
+		
+		aux->prox = aux2->prox;
+		free(aux2);
+		return lst;
+	}
+	
+	return lst;
 }
 
 int main(void)
