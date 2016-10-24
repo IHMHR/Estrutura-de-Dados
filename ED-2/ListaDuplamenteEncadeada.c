@@ -20,6 +20,17 @@ struct lista
 	Tlista *ant;
 };
 
+int isListaVazia(Tlista *lst)
+{
+    if(lst == NULL)
+    {
+        return 1;
+    }
+    else
+    {
+        return 0;
+    }
+}
 
 Tlista* inserir(Tlista *anterior, char letra)
 {
@@ -56,6 +67,61 @@ void imprime(Tlista *lst)
 			lst = lst->prox;
 		}
 	}
+}
+
+Tlista* buscaElemento(Tlista *lst, char letra)
+{
+    if(isListaVazia(lst))
+    {
+        return NULL;
+    }
+    else
+    {
+        while(!isListaVazia(lst))
+        {
+            if(lst->dado == letra)
+            {
+                return lst;
+            }
+            lst = lst->prox;
+        }
+        return NULL;
+    }
+    return lst;
+}
+
+Tlista* liberarLista(Tlista *lst)
+{
+    if(isListaVazia(lst))
+    {
+        return NULL;
+    }
+    else if(lst->prox == NULL && lst->ant == NULL) //somente este elemento na lista
+    {
+        free(lst);
+        return NULL;
+    }
+    else
+    {
+        Tlista *aux = lst;
+
+        while(!isListaVazia(aux))
+        {
+            if(lst->prox != NULL)
+            {
+                lst = lst->prox;
+                lst->ant = NULL;
+                free(aux);
+                aux = lst;
+            }
+            else
+            {
+                free(lst);
+                return NULL;
+            }
+        }
+        return NULL;
+    }
 }
 
 int main(void)
