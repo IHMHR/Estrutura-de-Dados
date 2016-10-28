@@ -99,7 +99,8 @@ Tlista* liberarLista(Tlista *lst)
     else if(lst->prox == NULL && lst->ant == NULL) //somente este elemento na lista
     {
         free(lst);
-        return NULL;
+        lst = NULL;
+        return lst;
     }
     else
     {
@@ -117,11 +118,78 @@ Tlista* liberarLista(Tlista *lst)
             else
             {
                 free(lst);
-                return NULL;
+                lst = NULL;
+                return lst;
             }
         }
-        return NULL;
+        return lst;
     }
+}
+
+Tlista* removeElemento(Tlista *lst, char letra)
+{
+	/*if(isListaVazia(lst))
+	{
+		return NULL;
+	}
+	else if(lst->prox == NULL && lst->ant == NULL && lst->dado == letra) //somente este elemento na lista e é o elemento
+	{
+		free(lst);
+		lst = NULL;
+		return lst;
+	}
+	else if(lst->ant != NULL && lst->dado == letra) //primeiro elemento com mais elementos
+	{
+		Tlista *aux = lst;
+		aux->prox->ant = NULL;
+		aux = aux->prox;
+		free(letra);
+		return aux;
+	}
+	else
+	{
+		Tlista *aux = lst;
+		while(!isListaVazia(aux))
+		{
+			if(lst->dado == letra)
+			{
+				lst = lst->prox;
+				lst->ant = NULL;
+				free(aux);
+				aux = lst;
+			}
+		}
+		return lst;
+	}*/
+
+	Tlista *aux = buscaElemento(lst, letra);
+
+	if(aux->ant == NULL && aux->prox == NULL)
+	{
+		lst = lst->prox;
+		free(aux);
+		aux = lst;
+	}
+	else if(aux->ant == NULL)
+	{
+		lst = lst->prox;
+		lst->ant = NULL;
+		free(aux);
+		aux = lst;
+	}
+	else
+	{
+		aux->ant->prox = NULL;
+		if(aux->prox != NULL)
+		{
+			aux->prox->ant = aux->ant;
+		}
+		free(aux);
+		aux = lst;
+	}
+
+	return lst;
+
 }
 
 int main(void)
@@ -134,6 +202,10 @@ int main(void)
 
 	//printf("%c \n\n", listaCompleta->ant->ant->ant->prox->prox->prox->dado);
 	printf("%c \n\n", listaCompleta->prox->prox->prox->ant->ant->ant->dado);
+
+	imprime(listaCompleta);
+
+	listaCompleta = liberarLista(listaCompleta);
 
 	imprime(listaCompleta);
 
