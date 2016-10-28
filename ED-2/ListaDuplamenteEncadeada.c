@@ -167,15 +167,11 @@ Tlista* removeElemento(Tlista *lst, char letra)
 	if(aux->ant == NULL && aux->prox == NULL)
 	{
 		lst = lst->prox;
-		free(aux);
-		aux = lst;
 	}
 	else if(aux->ant == NULL)
 	{
 		lst = lst->prox;
 		lst->ant = NULL;
-		free(aux);
-		aux = lst;
 	}
 	else
 	{
@@ -184,10 +180,10 @@ Tlista* removeElemento(Tlista *lst, char letra)
 		{
 			aux->prox->ant = aux->ant;
 		}
-		free(aux);
-		aux = lst;
 	}
 
+	free(aux);
+	aux = lst;
 	return lst;
 
 }
