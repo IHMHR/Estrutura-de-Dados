@@ -35,16 +35,15 @@ int isListaVazia(Tlista *lst)
 Tlista* inserirElemento(Tlista *lst, char letra)
 {
 	Tlista *aux = (Tlista*) malloc(sizeof(Tlista));
+	aux->dado = letra;
 
 	if(isListaVazia(lst))
 	{
-		aux->dado = letra;
 		aux->prox = aux;
 		aux->ant = aux;
 	}
 	else
 	{
-		aux->dado = letra;
 		aux->prox = lst;
 		lst->ant->prox = aux;
 		aux->ant = lst->ant;
@@ -102,13 +101,67 @@ Tlista* liberarLista(Tlista *lst)
 	}
 	else if(lst->prox == lst && lst->ant == lst)
 	{
+		lst->ant = NULL;
+		lst->prox = NULL;
 		free(lst);
-		return NULL;
+		lst = NULL;
 	}
 	else
 	{
+		while(!isListaVazia(lst))
+		{
 
+		}
+
+		/*Tlista *aux = lst;
+		lst = lst->prox;
+		while(!isListaVazia(lst->prox))
+		{
+			lst->ant = aux->ant;
+			aux->ant->prox = lst;
+			free(aux);
+			aux = lst;
+		}
+		lst = NULL;*/
 	}
+
+	return lst;
+}
+
+Tlista* removerElemento(Tlista *lst, char letra)
+{
+	if(isListaVazia(lst))
+	{
+		printf("Lista vazia !");
+	}
+	else if(lst->prox == lst && lst->ant == lst && lst->dado == letra)
+	{
+		lst->ant = NULL;
+		lst->prox = NULL;
+		free(lst);
+		lst = NULL;
+	}
+	else if(((lst->prox != lst || lst->ant != lst) && lst->dado == letra))
+	{
+		Tlista *aux = lst;
+		aux->prox = aux->prox->prox;
+		aux->ant = aux->ant->ant;
+		free(aux);
+		aux = NULL;
+	}
+	else
+	{
+		Tlista *aux = buscarElemento(lst, letra);
+		if(!isListaVazia(aux))
+		{
+			aux->ant->prox = aux->prox;
+			aux->prox->ant = aux->ant;
+			free(aux);
+			aux = NULL;
+		}
+	}
+
+	return lst;
 }
 
 int main(void)
@@ -121,11 +174,19 @@ int main(void)
 
 	imprimirLista(listaCompleta);
 
-	printf("\n %c \n\n", listaCompleta->prox->prox->prox->prox->ant->ant->ant->ant->dado);
+	/*printf("\n %c \n\n", listaCompleta->prox->prox->prox->prox->ant->ant->ant->ant->dado);
 
 	Tlista *listaPesq = buscarElemento(listaCompleta, 'A');
 
-	imprimirLista(listaPesq);
+	imprimirLista(listaPesq);*/
+
+	printf("\n");
+
+	listaCompleta = removerElemento(listaCompleta, 'E');
+
+	//listaCompleta = liberarLista(listaCompleta);
+
+	imprimirLista(listaCompleta);
 
 	return 0;
 }
