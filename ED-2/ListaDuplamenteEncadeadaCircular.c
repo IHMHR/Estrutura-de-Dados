@@ -110,19 +110,25 @@ Tlista* liberarLista(Tlista *lst)
 	{
 		while(!isListaVazia(lst))
 		{
-
+			if(lst != lst->prox)
+			{
+				Tlista *aux = lst;
+				lst = lst->prox;
+				aux->prox = aux->prox->prox;
+				aux->ant = aux->ant->ant;
+				aux->ant->prox = aux->prox;
+				aux->prox->ant = aux->ant;
+				free(aux);
+				aux = lst;
+			}
+			else
+			{
+				lst->ant = NULL;
+				lst->prox = NULL;
+				free(lst);
+				lst = NULL;
+			}
 		}
-
-		/*Tlista *aux = lst;
-		lst = lst->prox;
-		while(!isListaVazia(lst->prox))
-		{
-			lst->ant = aux->ant;
-			aux->ant->prox = lst;
-			free(aux);
-			aux = lst;
-		}
-		lst = NULL;*/
 	}
 
 	return lst;
@@ -144,8 +150,9 @@ Tlista* removerElemento(Tlista *lst, char letra)
 	else if(((lst->prox != lst || lst->ant != lst) && lst->dado == letra))
 	{
 		Tlista *aux = lst;
-		aux->prox = aux->prox->prox;
-		aux->ant = aux->ant->ant;
+		lst = lst->prox;
+		aux->ant->prox = aux->prox;
+		aux->prox->ant = aux->ant;
 		free(aux);
 		aux = NULL;
 	}
@@ -168,9 +175,9 @@ int main(void)
 {
 	Tlista *listaCompleta = NULL;
 	listaCompleta = inserirElemento(listaCompleta, 'F');
-	listaCompleta = inserirElemento(listaCompleta, 'A');
+	/*listaCompleta = inserirElemento(listaCompleta, 'A');
 	listaCompleta = inserirElemento(listaCompleta, 'C');
-	listaCompleta = inserirElemento(listaCompleta, 'E');
+	listaCompleta = inserirElemento(listaCompleta, 'E');*/
 
 	imprimirLista(listaCompleta);
 
@@ -182,9 +189,9 @@ int main(void)
 
 	printf("\n");
 
-	listaCompleta = removerElemento(listaCompleta, 'E');
+	//listaCompleta = removerElemento(listaCompleta, 'E');
 
-	//listaCompleta = liberarLista(listaCompleta);
+	listaCompleta = liberarLista(listaCompleta);
 
 	imprimirLista(listaCompleta);
 
