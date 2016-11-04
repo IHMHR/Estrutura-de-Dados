@@ -108,7 +108,7 @@ Tlista* liberarLista(Tlista *lst)
 	}
 	else
 	{
-		while(!isListaVazia(lst))
+		do
 		{
 			if(lst != lst->prox)
 			{
@@ -128,7 +128,7 @@ Tlista* liberarLista(Tlista *lst)
 				free(lst);
 				lst = NULL;
 			}
-		}
+		} while(!isListaVazia(lst));
 	}
 
 	return lst;
@@ -175,9 +175,9 @@ int main(void)
 {
 	Tlista *listaCompleta = NULL;
 	listaCompleta = inserirElemento(listaCompleta, 'F');
-	/*listaCompleta = inserirElemento(listaCompleta, 'A');
+	listaCompleta = inserirElemento(listaCompleta, 'A');
 	listaCompleta = inserirElemento(listaCompleta, 'C');
-	listaCompleta = inserirElemento(listaCompleta, 'E');*/
+	listaCompleta = inserirElemento(listaCompleta, 'E');
 
 	imprimirLista(listaCompleta);
 
