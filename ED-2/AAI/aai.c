@@ -418,9 +418,9 @@ int main( int argc, char* args[] )
   
 
   // The window is open: enter program loop (see SDL_PollEvent)
-  int done = 0, qnttiros = 0;
+  int done = 0;
   
-  int i = 0;
+  int i = 0, tmp = 1, m = 120;
   
   //Event loop
   while(!done)
@@ -428,35 +428,10 @@ int main( int argc, char* args[] )
   	if(i % 30 == 0)
   	{
   		enemy.shooting = 0;
-  		//if(i % 7 == 0)
-  		//if(i > 400 || i < 4000)
-  		/*if(i == 120 || i == 120*2 || i == 120*3 || i == 120*4 || i == 120*5 || i == 120*6 || i == 120*7 || i == 120*8
-		  || i == 120*9 || i == 120*10 || i == 120*11 || i == 90*12 || i == 90*15 || i == 90*16 || i == 90*17 || i == 90*18
-		  || i == 90*17 || i == 90*18 || i == 90*19 || i == 90*20 || i == 90*21 || i == 90*22 || i == 90*23 || i == 90*24
-		  || i == 90*25 || i == 90*26 || i == 90*27 || i == 90*28 || i == 90*29 )*/
-		if(qnttiros < 15)
+  		if(i == m*tmp) /* NEVER STOP SHOOTING */
 		{
-			if(i == 120*qnttiros)
-  			{
-  				qnttiros++;
-  				enemyShooting();
-			}
-		}
-		else if(qnttiros < 45)
-		{
-			if(i == 60*qnttiros)
-  			{
-  				qnttiros++;
-  				enemyShooting();
-			}
-		}
-		else
-		{
-			if(i == 30*qnttiros)
-  			{
-  				qnttiros++;
-  				enemyShooting();
-			}
+			tmp++;
+		  	enemyShooting();
 		}
 		
 		//if(globalTime % 5 == 0 && enemy.x > 5)
