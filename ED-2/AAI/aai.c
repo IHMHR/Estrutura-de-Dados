@@ -260,8 +260,16 @@ void updateLogic(Man *man)
 		}
 		
 		if(bullets[i]->x > man->x && bullets[i]->x < man->x+40 &&
-		   bullets[i]->y > man->y && bullets[i]->x < man->x+50 && !man->shooting)
+		   bullets[i]->y > man->y && bullets[i]->x < man->x+50 && !man->shooting
+		   && (man->y - bullets[i]->y) > -25)
   		{
+  			printf("\n\n\n\n\n\n\n\n");
+  			printf("man->y - bullets[i]->y  ==  %f\n", man->y - bullets[i]->y);
+  			printf("man X = %f\n", man->x);
+  			printf("Bullet X = %f\n", bullets[i]->x);
+  			printf("man Y = %f\n", man->y);
+  			printf("Bullet Y = %f\n", bullets[i]->y);
+  			printf("\n\n");
   			man->alive = 0;
 		}
   		
@@ -410,7 +418,7 @@ int main( int argc, char* args[] )
   
 
   // The window is open: enter program loop (see SDL_PollEvent)
-  int done = 0;
+  int done = 0, qnttiros = 0;
   
   int i = 0;
   
@@ -422,10 +430,33 @@ int main( int argc, char* args[] )
   		enemy.shooting = 0;
   		//if(i % 7 == 0)
   		//if(i > 400 || i < 4000)
-  		if(i == 120 || i == 120*2 || i == 120*3 || i == 120*4 || i == 120*5 || i == 120*6 || i == 120*7 || i == 120*8 ||
-		  i == 120*9 || i == 120*10 || i == 120*11 || i == 90*12 || i == 90*15 || i == 90*16 || i == 90*17 || i == 90*18)
-  		{
-  			enemyShooting();
+  		/*if(i == 120 || i == 120*2 || i == 120*3 || i == 120*4 || i == 120*5 || i == 120*6 || i == 120*7 || i == 120*8
+		  || i == 120*9 || i == 120*10 || i == 120*11 || i == 90*12 || i == 90*15 || i == 90*16 || i == 90*17 || i == 90*18
+		  || i == 90*17 || i == 90*18 || i == 90*19 || i == 90*20 || i == 90*21 || i == 90*22 || i == 90*23 || i == 90*24
+		  || i == 90*25 || i == 90*26 || i == 90*27 || i == 90*28 || i == 90*29 )*/
+		if(qnttiros < 15)
+		{
+			if(i == 120*qnttiros)
+  			{
+  				qnttiros++;
+  				enemyShooting();
+			}
+		}
+		else if(qnttiros < 45)
+		{
+			if(i == 60*qnttiros)
+  			{
+  				qnttiros++;
+  				enemyShooting();
+			}
+		}
+		else
+		{
+			if(i == 30*qnttiros)
+  			{
+  				qnttiros++;
+  				enemyShooting();
+			}
 		}
 		
 		//if(globalTime % 5 == 0 && enemy.x > 5)
