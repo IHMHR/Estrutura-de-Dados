@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <locale.h>
 
-#define MUNICAO 12
+#define MUNICAO 15
 
 /*
 -lmingw32 -lSDL2main -lSDL2 -lSDL2_image
@@ -309,8 +309,25 @@ void updateLogic(Man *man)
   globalTime++;
 }
 
-void enemyShooting(int i)
+void enemyShooting(int i, int wX)
 {
+	// Only shoot if warrior ahead
+	if(enemy.facingLeft)
+	{
+		if(wX > enemy.x)
+		{
+			return;
+		}
+	}
+	else
+	{
+		if(wX < enemy.x)
+		{
+			return;
+		}
+	}
+	
+	
   if(!enemy.walking && enemy.alive)
   {
     if(globalTime % 6 == 0)
@@ -512,25 +529,25 @@ int main( int argc, char* args[] )
 		{
 			tmp++;
 			enemy.shooting = 0;
-		  	enemyShooting(0);
+		  	enemyShooting(0, man.x);
 		}
 		
 		if(enemy.qntTiros > 10)
 		{
 			enemy.shooting = 0;
-			enemyShooting(0);
+			enemyShooting(0, man.x);
 		}
 		if(enemy.qntTiros > 40)
 		{
 			enemy.shooting = 0;
-			enemyShooting(0);
+			enemyShooting(0, man.x);
 		}
 		if(enemy.qntTiros > 60)
 		{
 			for(k = 0; k < 2; k++)
 			{
 				enemy.shooting = 0;
-				enemyShooting(0);
+				enemyShooting(0, man.x);
 			}
 		}
 		if(enemy.qntTiros > 100)
@@ -538,7 +555,7 @@ int main( int argc, char* args[] )
 			for(k = 0; k < 5; k++)
 			{
 				enemy.shooting = 0;
-				enemyShooting(1);
+				enemyShooting(1, man.x);
 			}
 		}
 		if(enemy.qntTiros > 300)
@@ -546,7 +563,7 @@ int main( int argc, char* args[] )
 			for(k = 0; k < 10; k++)
 			{
 				enemy.shooting = 0;
-				enemyShooting(2);
+				enemyShooting(2, man.x);
 		 	}
 		}
 		enemy.shooting = 0;
