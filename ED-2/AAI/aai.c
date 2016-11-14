@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <locale.h>
 
-#define MUNICAO 999
+#define MUNICAO 1000
 
 /*
 -lmingw32 -lSDL2main -lSDL2 -lSDL2_image
@@ -14,6 +14,7 @@ typedef struct
   short life;
   char *name;
   int currentSprite, walking, facingLeft, shooting, alive, visible;
+  int qntTiros;
   
   SDL_Texture *sheetTexture;
 } Man;
@@ -21,6 +22,7 @@ typedef struct
 typedef struct
 {
 	float x, y, dx;
+	char belongs;
 } Bullet;
 
 SDL_Texture *bulletTexture;
@@ -30,7 +32,7 @@ Man enemy;
 
 int globalTime = 0;
 
-void addBullet(float x, float y, float dx)
+void addBullet(float x, float y, float dx, char belongs)
 {
 	int i;
 	int found = -1;
@@ -49,6 +51,7 @@ void addBullet(float x, float y, float dx)
 		bullets[i]->x = x;
 		bullets[i]->y = y;
 		bullets[i]->dx = dx;
+		bullets[i]->belongs = belongs;
 	}
 }
 
@@ -160,11 +163,13 @@ if(!man->shooting)
 	    
 	    if(!man->facingLeft)
 	    {
-			addBullet(man->x+35, man->y+20, 5);
+	    	man->qntTiros++;
+			addBullet(man->x+35, man->y+20, 5, 'W');
 		}
 		else
 		{
-			addBullet(man->x-2, man->y+20, -5);	
+			man->qntTiros++;
+			addBullet(man->x-2, man->y+20, -5, 'W');
 		}
    	  } 
    	  man->shooting = 0;
@@ -253,23 +258,22 @@ void updateLogic(Man *man)
   	{
   		bullets[i]->x += bullets[i]->dx;
   		
-  		if(bullets[i]->x > enemy.x && bullets[i]->x < enemy.x+40 &&
-		   bullets[i]->y > enemy.y && bullets[i]->x < enemy.x+50 && !enemy.shooting)
+  		/*if(bullets[i]->x > enemy.x && bullets[i]->x < enemy.x+40 &&
+		   bullets[i]->y > enemy.y && bullets[i]->x < enemy.x+50 && !enemy.shooting)*/
+		if(bullets[i]->x > enemy.x && bullets[i]->x < enemy.x+40 &&
+		   bullets[i]->y > enemy.y && bullets[i]->x < enemy.x+50 &&
+		   bullets[i]->belongs == 'W')
   		{
   			enemy.alive = 0;
 		}
 		
-		if(bullets[i]->x > man->x && bullets[i]->x < man->x+40 &&
+		/*if(bullets[i]->x > man->x && bullets[i]->x < man->x+40 &&
 		   bullets[i]->y > man->y && bullets[i]->x < man->x+50 && !man->shooting
-		   && (man->y - bullets[i]->y) > -25)
+		   && (man->y - bullets[i]->y) > -25)*/
+		if(bullets[i]->x > man->x && bullets[i]->x < man->x+40 &&
+		   bullets[i]->y > man->y && bullets[i]->x < man->x+50 &&
+		   (man->y - bullets[i]->y) > -25 && bullets[i]->belongs == 'E')
   		{
-  			printf("\n\n\n\n\n\n\n\n");
-  			printf("man->y - bullets[i]->y  ==  %f\n", man->y - bullets[i]->y);
-  			printf("man X = %f\n", man->x);
-  			printf("Bullet X = %f\n", bullets[i]->x);
-  			printf("man Y = %f\n", man->y);
-  			printf("Bullet Y = %f\n", bullets[i]->y);
-  			printf("\n\n");
   			man->alive = 0;
 		}
   		
@@ -313,18 +317,20 @@ void enemyShooting()
 	  else
 	  {
      	enemy.currentSprite = 4;
-	   }
+	  }
 	   
+	  enemy.shooting = 1;
 	  if(!enemy.facingLeft)
 	  {
-		addBullet(enemy.x+32, enemy.y+20, 5);
+		addBullet(enemy.x+32, enemy.y+20, 5, 'E');
+		enemy.qntTiros++;
       }
 	  else
 	  {
-		addBullet(enemy.x+5, enemy.y+20, -5);	
+		addBullet(enemy.x+5, enemy.y+20, -5, 'E');
+		enemy.qntTiros++;
 	  }
 	} 
-	  enemy.shooting = 1;
   }
   else
   {
@@ -348,6 +354,7 @@ int main( int argc, char* args[] )
   man.facingLeft = 0;
   man.alive = 1;
   man.visible = 1;
+  man.qntTiros = 0;
   
   enemy.x = 275;
   enemy.y = 60;
@@ -355,6 +362,7 @@ int main( int argc, char* args[] )
   enemy.currentSprite = 4;
   enemy.alive = 1;
   enemy.visible = 1;
+  enemy.qntTiros = 0;
   
   window = SDL_CreateWindow("IHMHR Game",                     // window title
                             SDL_WINDOWPOS_UNDEFINED,           // initial x position
@@ -413,26 +421,61 @@ int main( int argc, char* args[] )
   
   bulletTexture = SDL_CreateTextureFromSurface(renderer, bullet);
   SDL_FreeSurface(bullet);
-  
-  
-  
 
   // The window is open: enter program loop (see SDL_PollEvent)
   int done = 0;
   
   int i = 0, tmp = 1, m = 120;
+  int k = 0;
   
   //Event loop
   while(!done)
   {
   	if(i % 30 == 0)
   	{
-  		enemy.shooting = 0;
   		if(i == m*tmp) /* NEVER STOP SHOOTING */
 		{
 			tmp++;
+			enemy.shooting = 0;
 		  	enemyShooting();
 		}
+		
+		if(enemy.qntTiros > 10)
+		{
+			enemy.shooting = 0;
+			enemyShooting();
+		}
+		if(enemy.qntTiros > 40)
+		{
+			enemy.shooting = 0;
+			enemyShooting();
+		}
+		if(enemy.qntTiros > 60)
+		{
+			for(k = 0; k < 2; k++)
+			{
+				enemy.shooting = 0;
+				enemyShooting();
+			}
+		}
+		if(enemy.qntTiros > 100)
+		{
+			for(k = 0; k < 5; k++)
+			{
+				enemy.shooting = 0;
+				enemyShooting();
+			}
+		}
+		if(enemy.qntTiros > 300)
+		{
+			for(k = 0; k < 10; k++)
+			{
+				enemy.shooting = 0;
+				enemyShooting();
+		 	}
+		}
+		enemy.shooting = 0;
+		
 		
 		//if(globalTime % 5 == 0 && enemy.x > 5)
 		if(enemy.facingLeft)
