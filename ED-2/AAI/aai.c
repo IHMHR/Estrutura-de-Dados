@@ -1,5 +1,6 @@
 #include "SDL2/SDL.h" 
 #include <stdio.h>
+#include <stdlib.h>
 #include <locale.h>
 
 #define MUNICAO 1000
@@ -7,6 +8,12 @@
 /*
 -lmingw32 -lSDL2main -lSDL2 -lSDL2_image
 */
+
+typedef struct
+{
+	char *nome;
+	
+} usuario;
 
 typedef struct
 {
@@ -268,7 +275,7 @@ void updateLogic(Man *man)
 		}
 		
 		/*if(bullets[i]->x > man->x && bullets[i]->x < man->x+40 &&
-		   bullets[i]->y > man->y && bullets[i]->x < man->x+50 && !man->shooting
+		   bullets[i]4->y > man->y && bullets[i]->x < man->x+50 && !man->shooting
 		   && (man->y - bullets[i]->y) > -25)*/
 		if(bullets[i]->x > man->x && bullets[i]->x < man->x+40 &&
 		   bullets[i]->y > man->y && bullets[i]->x < man->x+50 &&
@@ -304,7 +311,7 @@ void updateLogic(Man *man)
   globalTime++;
 }
 
-void enemyShooting()
+void enemyShooting(int i)
 {
   if(!enemy.walking && enemy.alive)
   {
@@ -322,12 +329,34 @@ void enemyShooting()
 	  enemy.shooting = 1;
 	  if(!enemy.facingLeft)
 	  {
-		addBullet(enemy.x+32, enemy.y+20, 5, 'E');
+	  	if(i == 1)
+	  	{
+	  		addBullet(enemy.x+32, enemy.y+20, 10, 'E');
+		}
+		else if(i == 2)
+		{
+			addBullet(enemy.x+32, enemy.y+20, 15, 'E');
+		}
+		else
+		{
+			addBullet(enemy.x+32, enemy.y+20, 5, 'E');
+		}
 		enemy.qntTiros++;
       }
 	  else
 	  {
-		addBullet(enemy.x+5, enemy.y+20, -5, 'E');
+	  	if(i == 1)
+	  	{
+			addBullet(enemy.x+5, enemy.y+20, -10, 'E');
+		}
+		else if(i == 2)
+		{
+			addBullet(enemy.x+5, enemy.y+20, -15, 'E');
+		}
+		else
+		{
+			addBullet(enemy.x+5, enemy.y+20, -5, 'E');
+		}
 		enemy.qntTiros++;
 	  }
 	} 
@@ -341,8 +370,9 @@ void enemyShooting()
 
 int main( int argc, char* args[] ) 
 {
-	setlocale(LC_ALL, "Portuguese");
-	SDL_Window *window;                    // Declare a window
+  setlocale(LC_ALL, "Portuguese");  
+  
+  SDL_Window *window;                    // Declare a window
   SDL_Renderer *renderer;                // Declare a renderer
   
   SDL_Init(SDL_INIT_VIDEO);              // Initialize SDL2
@@ -437,25 +467,25 @@ int main( int argc, char* args[] )
 		{
 			tmp++;
 			enemy.shooting = 0;
-		  	enemyShooting();
+		  	enemyShooting(0);
 		}
 		
 		if(enemy.qntTiros > 10)
 		{
 			enemy.shooting = 0;
-			enemyShooting();
+			enemyShooting(0);
 		}
 		if(enemy.qntTiros > 40)
 		{
 			enemy.shooting = 0;
-			enemyShooting();
+			enemyShooting(0);
 		}
 		if(enemy.qntTiros > 60)
 		{
 			for(k = 0; k < 2; k++)
 			{
 				enemy.shooting = 0;
-				enemyShooting();
+				enemyShooting(0);
 			}
 		}
 		if(enemy.qntTiros > 100)
@@ -463,7 +493,7 @@ int main( int argc, char* args[] )
 			for(k = 0; k < 5; k++)
 			{
 				enemy.shooting = 0;
-				enemyShooting();
+				enemyShooting(1);
 			}
 		}
 		if(enemy.qntTiros > 300)
@@ -471,7 +501,7 @@ int main( int argc, char* args[] )
 			for(k = 0; k < 10; k++)
 			{
 				enemy.shooting = 0;
-				enemyShooting();
+				enemyShooting(2);
 		 	}
 		}
 		enemy.shooting = 0;
@@ -532,7 +562,7 @@ int main( int argc, char* args[] )
 			printf("\n\n\n\n\n\n\n\n\n\t\t\tIT'S TOO EASY...");
 			printf("\n\n\n\n\n\n\n\n\n");
 		}
-		done = 1;	
+		done = 1;
 	}
     
     i++;
