@@ -1,9 +1,8 @@
 #include "SDL2/SDL.h" 
 #include <stdio.h>
-#include <stdlib.h>
 #include <locale.h>
 
-#define MUNICAO 1000
+#define MUNICAO 12
 
 /*
 -lmingw32 -lSDL2main -lSDL2 -lSDL2_image
@@ -11,17 +10,18 @@
 
 typedef struct
 {
-	char *nome;
+	int bulletSpeed;
 	
 } usuario;
+
+usuario us;
 
 typedef struct
 {
   float x, y, dy;
   short life;
   char *name;
-  int currentSprite, walking, facingLeft, shooting, alive, visible;
-  int qntTiros;
+  int currentSprite, walking, facingLeft, shooting, alive, qntTiros;
   
   SDL_Texture *sheetTexture;
 } Man;
@@ -51,7 +51,7 @@ void addBullet(float x, float y, float dx, char belongs)
 			break;
 		}
 	}
-  	
+
 	if(found >= 0)
 	{
 		bullets[i] = (Bullet*) malloc(sizeof(Bullet));
@@ -168,15 +168,18 @@ if(!man->shooting)
     	  man->currentSprite = 4;
 	    }
 	    
-	    if(!man->facingLeft)
+	    if(man->qntTiros <= MUNICAO)
 	    {
-	    	man->qntTiros++;
-			addBullet(man->x+35, man->y+20, 5, 'W');
-		}
-		else
-		{
-			man->qntTiros++;
-			addBullet(man->x-2, man->y+20, -5, 'W');
+			if(!man->facingLeft)
+	    	{
+	    		man->qntTiros++;
+				addBullet(man->x+35, man->y+20, us.bulletSpeed, 'W');
+			}
+			else
+			{
+				man->qntTiros++;
+				addBullet(man->x-2, man->y+20, -us.bulletSpeed, 'W');
+			}
 		}
    	  } 
    	  man->shooting = 0;
@@ -218,7 +221,7 @@ void doRender(SDL_Renderer *renderer, Man *man)
   SDL_RenderCopy(renderer, backgroundTexture, NULL, NULL);
 
   //warrior
-  if(man->visible)
+  if(man->alive)
   {
   	SDL_Rect srcRect = { 40*man->currentSprite, 0, 40, 50 };  
   	SDL_Rect rect = { man->x, man->y, 40, 50 };  
@@ -226,7 +229,7 @@ void doRender(SDL_Renderer *renderer, Man *man)
   }
 
   //enemy
-  if(enemy.visible)
+  if(enemy.alive)
   {
   	SDL_Rect srcRectEnemy = { 40*enemy.currentSprite, 0, 40, 50 };  
   	SDL_Rect rectEnemy = { enemy.x, enemy.y, 40, 50 };  
@@ -263,20 +266,15 @@ void updateLogic(Man *man)
   {
   	if(bullets[i])
   	{
-  		bullets[i]->x += bullets[i]->dx;
-  		
-  		/*if(bullets[i]->x > enemy.x && bullets[i]->x < enemy.x+40 &&
-		   bullets[i]->y > enemy.y && bullets[i]->x < enemy.x+50 && !enemy.shooting)*/
+ 		bullets[i]->x += bullets[i]->dx;
+ 
 		if(bullets[i]->x > enemy.x && bullets[i]->x < enemy.x+40 &&
 		   bullets[i]->y > enemy.y && bullets[i]->x < enemy.x+50 &&
 		   bullets[i]->belongs == 'W')
   		{
   			enemy.alive = 0;
 		}
-		
-		/*if(bullets[i]->x > man->x && bullets[i]->x < man->x+40 &&
-		   bullets[i]4->y > man->y && bullets[i]->x < man->x+50 && !man->shooting
-		   && (man->y - bullets[i]->y) > -25)*/
+
 		if(bullets[i]->x > man->x && bullets[i]->x < man->x+40 &&
 		   bullets[i]->y > man->y && bullets[i]->x < man->x+50 &&
 		   (man->y - bullets[i]->y) > -25 && bullets[i]->belongs == 'E')
@@ -300,7 +298,7 @@ void updateLogic(Man *man)
 				enemy.currentSprite++;
 				if(enemy.currentSprite > 7)
 				{
-					enemy.visible = 0;
+					enemy.alive = 0;
 					enemy.currentSprite = 7;	
 				}
 			}
@@ -370,7 +368,50 @@ void enemyShooting(int i)
 
 int main( int argc, char* args[] ) 
 {
-  setlocale(LC_ALL, "Portuguese");  
+  setlocale(LC_ALL, "Portuguese");
+  
+  /*usuario user;
+  printf("\t\t\t\tOlá, seja bem vindo !");
+  printf("\nPrimeiramente, qual seu nome ?\n");*/
+  
+  /*user.nome == NULL;
+  do
+  {
+  	gets(user.nome);
+  } while(user.nome != NULL);*/
+  //user.nome = getchar();
+  /*do
+    gets(user.nome);
+  while ( user.nome != EOF && user.nome != '\n' ); */
+  /*system("cls");
+  do
+  	printf("%c", user.nome );
+  while (user.nome != '\0');*/
+  /*char *buffer;
+  size_t bufsize = 32;
+  size_t characters;
+
+  buffer = (char *)malloc(bufsize * sizeof(char));
+  if( buffer == NULL)
+  {
+      perror("Unable to allocate buffer");
+      exit(1);
+  }
+
+  //printf("Type something: ");
+  characters = getline(&buffer,&bufsize,stdin);
+  
+  printf("%s", characters);*/
+  /*char buffer[32];
+  char *b = buffer;
+  size_t bufsize = 32;
+  size_t characters;
+
+  printf("Type something: ");
+  characters = getline(&b,&bufsize,stdin);
+  printf("%zu characters were read.\n",characters);
+  printf("You typed: '%s'\n",buffer);*/
+  
   
   SDL_Window *window;                    // Declare a window
   SDL_Renderer *renderer;                // Declare a renderer
@@ -383,15 +424,19 @@ int main( int argc, char* args[] )
   man.currentSprite = 4;
   man.facingLeft = 0;
   man.alive = 1;
-  man.visible = 1;
   man.qntTiros = 0;
+  us.bulletSpeed = 5;
+  /*printf("\t\t\t\tOlá, seja bem vindo !");
+  printf("\nPrimeiramente, qual seu nome ?\n");
+  gets(man.name);
+  printf("\n%s, para configuar o jogo gostariamos que você informace a velocidade do tiro: \n");
+  fscanf("%d", &us.bulletSpeed);*/
   
   enemy.x = 275;
   enemy.y = 60;
   enemy.facingLeft = 1;
   enemy.currentSprite = 4;
   enemy.alive = 1;
-  enemy.visible = 1;
   enemy.qntTiros = 0;
   
   window = SDL_CreateWindow("IHMHR Game",                     // window title
