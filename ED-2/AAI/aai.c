@@ -311,19 +311,18 @@ void updateLogic(Man *man)
 
 void enemyShooting(int i, int wX)
 {
-	// Only shoot if warrior ahead
 	if(enemy.facingLeft)
 	{
 		if(wX > enemy.x)
 		{
-			return;
+			enemy.facingLeft = !enemy.facingLeft;
 		}
 	}
 	else
 	{
 		if(wX < enemy.x)
 		{
-			return;
+			enemy.facingLeft = !enemy.facingLeft;
 		}
 	}
 	
