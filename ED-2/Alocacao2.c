@@ -1,6 +1,6 @@
 /*
  ============================================================================
- Name        : ListaCircular.c
+ Name        : ProjetoCompleto.c
  Author      : IHMHR
  Version     :
  Copyright   : Your copyright notice
@@ -8,146 +8,159 @@
  ============================================================================
  */
 
-#include <stdio.h>
-#include <stdlib.h>
+#include "lista.h"
 
-typedef struct lista Tlista;
+typedef struct pilha Tpilha;
+typedef struct fila Tfila;
 
-struct lista
+struct pilha
 {
-	char dado;
-	Tlista *prox;
+	Tlista *topo;
 };
 
-int isListavazia(Tlista *lst)
+struct fila
 {
-	if(NULL == lst)
+	Tlista *inicio;
+	Tlista *final;
+};
+
+Tpilha* inicializarPilha()
+{
+	Tpilha *aux = (Tpilha*) malloc(sizeof(Tpilha));
+	aux->topo = NULL;
+	return aux;
+}
+
+void pushPilha(Tpilha *pilha, char letra)
+{
+	pilha->topo = inserir(pilha->topo, letra);
+}
+
+void imprimirPilha(Tpilha *pilha)
+{
+	imprime(pilha->topo);
+}
+
+void popPilha(Tpilha *pilha)
+{
+	pilha->topo = removeLista(pilha->topo, pilha->topo->dado);
+}
+
+void liberaPilha(Tpilha *pilha)
+{
+	pilha->topo = liberaCircular(pilha->topo);
+}
+
+int isPilhaVazia(Tpilha *pilha)
+{
+	return isListavazia(pilha->topo);
+}
+
+Tpilha* buscaPilha(Tpilha *pilha, char letra)
+{
+	return (Tlista *) BuscaCircular(pilha->topo, letra);
+}
+
+Tfila* inicializarFila()
+{
+	Tfila *aux = (Tfila *) malloc(sizeof(Tfila));
+	aux->inicio = aux->final = NULL;
+	return aux;
+}
+
+int isFilaVazia(Tfila *fila)
+{
+	return isListavazia(fila->inicio);
+}
+
+void inserirFila(Tfila *fila, char letra)
+{
+	if(isFilaVazia(fila))
 	{
-		return 1;
+		// inicio e final recebem a mesma Lista
+		fila->inicio = fila->final = inserir(NULL, letra);
 	}
 	else
 	{
-		return 0;
+		Tlista *aux = inserir(fila->inicio, letra);
+		fila->final->prox = aux;
+		fila->final = aux;
 	}
 }
 
-Tlista* inserir(Tlista *anterior, char letra)
+void imprimirFila(Tfila *fila)
 {
-	Tlista *aux = (Tlista*) malloc(sizeof(Tlista));
-	if(NULL == anterior)
-	{
-		aux->dado = letra;
-		aux->prox = aux;
-		return aux;
-	}
-	else
-	{
-
-		Tlista *auxN = anterior;
-		aux->dado = letra;
-		aux->prox = aux;
-		aux->prox = anterior;
-
-		do {
-			auxN = auxN->prox;
-		} while (auxN->prox != anterior);
-
-		auxN->prox = aux;
-
-		return aux;
-
-
-		/*//dado
-		//ligação
-		do
-		{ // para no ultimo da lista
-			aux2 = anterior;
-			/*aux->dado = letra;
-			aux->prox = aux2;
-			aux2->prox = aux;*/
-		/*} while(aux2->prox != anterior);
-		//ultimo no primeiro
-		aux2->prox = anterior;
-		return anterior;*/
-	}
+	imprime(fila->inicio);
 }
 
-void imprime(Tlista *lst)
+void removeFila(Tfila *fila)
 {
-	if(NULL == lst)
+	// remover no inicio
+	if(isFilaVazia(fila))
 	{
-		printf("Lista vazia !");
+		fila = inicializarFila();
 	}
 	else
 	{
-		Tlista *aux = lst;
-		do
+		/*Tlista *aux = fila->inicio;
+		fila->inicio = fila->inicio->prox;
+		free(aux);*/
+
+		fila->inicio = removeLista(fila->inicio, fila->inicio->dado);
+
+		if(fila->inicio == NULL)
 		{
-			printf("%c\n", lst->dado);
-			lst = lst->prox;
-		} while (aux != lst);
+			fila->final = fila->inicio;
+		}
 	}
 }
 
-Tlista* BuscaCircular(Tlista* lst, char letra)
+void liberarFila(Tfila *fila)
 {
-	if(isListavazia(lst))
-	{
-		return NULL; //return lst;
-	}
-	else
-	{
-		Tlista *aux = lst;
-		do
-		{
-			if(lst->dado == letra)
-			{
-				return lst;
-			}
-			lst = lst->prox;
-		} while (aux != lst);
-		return NULL;
-	}
+	fila->inicio = fila->final = libera(fila->inicio);
 }
 
-Tlista* liberaCircular(Tlista *lst)
+int main()
 {
-	while(!isListavazia(lst))
-	{
-		Tlista *aux = lst;
-		Tlista *aux2 = lst;
-		lst = lst->prox;
+	/*Tpilha *pilhaUsuario = inicializarPilha();
 
-		do
-		{
-			aux2 = aux2->prox;
-		} while (aux != aux2->prox);
+	pushPilha(pilhaUsuario, 'F');
+	pushPilha(pilhaUsuario, 'A');
+	pushPilha(pilhaUsuario, 'C');
+	pushPilha(pilhaUsuario, 'E');
 
-		free(aux);
-		aux2->prox = lst;
-	}
+	imprimirPilha(pilhaUsuario);
 
-	return lst;
-}
-
-int main(void)
-{
-	Tlista *listaCompleta = NULL;
-	listaCompleta = inserir(listaCompleta, 'F');
-	listaCompleta = inserir(listaCompleta, 'A');
-	listaCompleta = inserir(listaCompleta, 'C');
-	listaCompleta = inserir(listaCompleta, 'E');
-
-	imprime(listaCompleta);
-
+	popPilha(pilhaUsuario);
 	printf("\n");
 
-	printf("%p", BuscaCircular(listaCompleta, 'A'));
+	imprimirPilha(pilhaUsuario);
 
-	printf("\n\n");
+	liberaPilha(pilhaUsuario);
+	printf("\n");
 
-	listaCompleta = liberaCircular(listaCompleta);
-	printf("%s", isListavazia(listaCompleta) ? "Lista Vazia" : "Lista CHEIA");
+	imprimirPilha(pilhaUsuario);*/
+
+	Tfila *filaUsuario = inicializarFila();
+
+	inserirFila(filaUsuario, 'F');
+	inserirFila(filaUsuario, 'A');
+	inserirFila(filaUsuario, 'C');
+	inserirFila(filaUsuario, 'E');
+
+	imprimirFila(filaUsuario);
+
+	removeFila(filaUsuario);
+
+	printf("\n----------------------------\n");
+
+	imprimirFila(filaUsuario);
+
+	liberarFila(filaUsuario);
+
+	printf("\n----------------------------\n");
+
+	imprimirFila(filaUsuario);
 
 	return 0;
 }
