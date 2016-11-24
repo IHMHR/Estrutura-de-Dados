@@ -1,16 +1,20 @@
 #include "SDL2/SDL.h" 
+#include "SDL2/SDL_mixer.h"
 #include <stdio.h>
 #include <locale.h>
 
-#define MUNICAO 15
+#define MUNICAO 30
 
 /*
 -lmingw32 -lSDL2main -lSDL2 -lSDL2_image
+-SDL2_mixer
+-lmingw32 -lSDL2main -lSDL2 -lSDL2_image -SDL2_mixer
 */
 
 typedef struct
 {
 	int bulletSpeed;
+	char *nome;
 	
 } usuario;
 
@@ -78,7 +82,7 @@ void removeAllBullets()
 }
 
 
-int processEvents(SDL_Window *window, Man *man)
+int processEvents(SDL_Window *window, Man *man, Mix_Chunk *atirando)
 {
   SDL_Event event;
   int done = 0;
@@ -115,27 +119,27 @@ int processEvents(SDL_Window *window, Man *man)
   }
   
   const Uint8 *state = SDL_GetKeyboardState(NULL);  
-if(!man->shooting)
-{
-  if(state[SDL_SCANCODE_LEFT])
+  if(!man->shooting)
   {
-  	if(man->x > -25.0)
-  	{
-  		man->x -= 3;
-  		man->walking = 1;
-  		man->facingLeft = 1;
+    if(state[SDL_SCANCODE_LEFT])
+    {
+      if(man->x > -25.0)
+  	  {
+  	  	  man->x -= 3;
+  		  man->walking = 1;
+  		  man->facingLeft = 1;
   	
-	    if(globalTime % 6 == 0)
-	    {
+	      if(globalTime % 6 == 0)
+	      {
 			man->currentSprite++;
       		man->currentSprite %= 4;
-    	}  
+    	  }  
+      }
     }
-  }
-  else if(state[SDL_SCANCODE_RIGHT])
-  {
-  	if(man->x <= 300.0)
-  	{
+    else if(state[SDL_SCANCODE_RIGHT])
+    {
+  	  if(man->x <= 300.0)
+  	  {
     	man->x += 3;
   		man->walking = 1;
   		man->facingLeft = 0;
@@ -145,44 +149,47 @@ if(!man->shooting)
       		man->currentSprite++;
       		man->currentSprite %= 4;
     	} 	
-	}
-  }else
-  {
-  	man->walking = 0;
-  	man->currentSprite = 4;
+	  }
+    }else
+    {
+  	  man->walking = 0;
+  	  man->currentSprite = 4;
+    }
   }
-}
   
   if(!man->walking)
   {
   	if(state[SDL_SCANCODE_SPACE])
     {
-      if(globalTime % 6 == 0)
-      {
-	    if(man->currentSprite == 4)   
-	    {
-    	  man->currentSprite = 5;
-	    }
-	    else
-	    {
-    	  man->currentSprite = 4;
-	    }
-	    
-	    if(man->qntTiros <= MUNICAO)
-	    {
-			if(!man->facingLeft)
+    	man->shooting = 1;
+    	if(globalTime % 6 == 0)
+      	{
+      		if(man->currentSprite == 4)   
 	    	{
-	    		man->qntTiros++;
-				addBullet(man->x+35, man->y+20, us.bulletSpeed, 'W');
+    	  		man->currentSprite = 5;
+	    	}
+	    	else
+	    	{
+    	  	man->currentSprite = 4;
+	    	}
+	    
+	    	if(man->qntTiros <= MUNICAO)
+	    	{
+				if(!man->facingLeft)
+	    		{
+	    			man->qntTiros++;
+	    			Mix_PlayChannel(-1, atirando, 0);
+					addBullet(man->x+35, man->y+20, us.bulletSpeed, 'W');
+				}
+				else
+				{
+					man->qntTiros++;
+					Mix_PlayChannel(-1, atirando, 0);
+					addBullet(man->x-2, man->y+20, -us.bulletSpeed, 'W');
+				}
 			}
-			else
-			{
-				man->qntTiros++;
-				addBullet(man->x-2, man->y+20, -us.bulletSpeed, 'W');
-			}
-		}
-   	  } 
-   	  man->shooting = 0;
+   	  	} 
+   	   	man->shooting = 0;
     }
     else
     {
@@ -193,7 +200,7 @@ if(!man->shooting)
   
   if(state[SDL_SCANCODE_UP] && !man->dy)
   {
-    if(man->y == 60.0)
+    if(man->y == 125.0)
   	{
   	  man->dy = -8;
 	}
@@ -255,9 +262,9 @@ void updateLogic(Man *man)
 {
   man->y += man->dy;
   man->dy += 0.5;
-  if(man->y > 60)
+  if(man->y > 125)
   {
-    man->y = 60;
+    man->y = 125;
     man->dy = 0;
   }
   
@@ -309,7 +316,7 @@ void updateLogic(Man *man)
   globalTime++;
 }
 
-void enemyShooting(int i, int wX)
+void enemyShooting(int i, int wX, Mix_Chunk *atirando)
 {
 	if(enemy.facingLeft)
 	{
@@ -345,14 +352,17 @@ void enemyShooting(int i, int wX)
 	  {
 	  	if(i == 1)
 	  	{
+	  		Mix_PlayChannel(-1, atirando, 0);
 	  		addBullet(enemy.x+32, enemy.y+20, 10, 'E');
 		}
 		else if(i == 2)
 		{
+			Mix_PlayChannel(-1, atirando, 0);
 			addBullet(enemy.x+32, enemy.y+20, 15, 'E');
 		}
 		else
 		{
+			Mix_PlayChannel(-1, atirando, 0);
 			addBullet(enemy.x+32, enemy.y+20, 5, 'E');
 		}
 		enemy.qntTiros++;
@@ -361,14 +371,17 @@ void enemyShooting(int i, int wX)
 	  {
 	  	if(i == 1)
 	  	{
+	  		Mix_PlayChannel(-1, atirando, 0);
 			addBullet(enemy.x+5, enemy.y+20, -10, 'E');
 		}
 		else if(i == 2)
 		{
+			Mix_PlayChannel(-1, atirando, 0);
 			addBullet(enemy.x+5, enemy.y+20, -15, 'E');
 		}
 		else
 		{
+			Mix_PlayChannel(-1, atirando, 0);
 			addBullet(enemy.x+5, enemy.y+20, -5, 'E');
 		}
 		enemy.qntTiros++;
@@ -386,57 +399,19 @@ int main( int argc, char* args[] )
 {
   setlocale(LC_ALL, "Portuguese");
   
-  /*usuario user;
-  printf("\t\t\t\tOlá, seja bem vindo !");
-  printf("\nPrimeiramente, qual seu nome ?\n");*/
+  Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048);
+  Mix_Chunk *atirando = Mix_LoadWAV("gunsshot.wav");
+  Mix_Chunk *start = Mix_LoadWAV("startgame.wav");
+  Mix_PlayChannel(-1, start, 0);
   
-  /*user.nome == NULL;
-  do
-  {
-  	gets(user.nome);
-  } while(user.nome != NULL);*/
-  //user.nome = getchar();
-  /*do
-    gets(user.nome);
-  while ( user.nome != EOF && user.nome != '\n' ); */
-  /*system("cls");
-  do
-  	printf("%c", user.nome );
-  while (user.nome != '\0');*/
-  /*char *buffer;
-  size_t bufsize = 32;
-  size_t characters;
-
-  buffer = (char *)malloc(bufsize * sizeof(char));
-  if( buffer == NULL)
-  {
-      perror("Unable to allocate buffer");
-      exit(1);
-  }
-
-  //printf("Type something: ");
-  characters = getline(&buffer,&bufsize,stdin);
+  SDL_Window *window;                    	  // Declare a window
+  SDL_Renderer *renderer;                	  // Declare a renderer
   
-  printf("%s", characters);*/
-  /*char buffer[32];
-  char *b = buffer;
-  size_t bufsize = 32;
-  size_t characters;
-
-  printf("Type something: ");
-  characters = getline(&b,&bufsize,stdin);
-  printf("%zu characters were read.\n",characters);
-  printf("You typed: '%s'\n",buffer);*/
-  
-  
-  SDL_Window *window;                    // Declare a window
-  SDL_Renderer *renderer;                // Declare a renderer
-  
-  SDL_Init(SDL_INIT_VIDEO);              // Initialize SDL2
+  SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);  // Initialize SDL2
   
   Man man;
   man.x = 25;
-  man.y = 0;
+  man.y = 125;
   man.currentSprite = 4;
   man.facingLeft = 0;
   man.alive = 1;
@@ -444,18 +419,19 @@ int main( int argc, char* args[] )
   us.bulletSpeed = 5;
   /*printf("\t\t\t\tOlá, seja bem vindo !");
   printf("\nPrimeiramente, qual seu nome ?\n");
-  gets(man.name);
+  gets(us.nome);
+  printf("\n%s", us.nome);
   printf("\n%s, para configuar o jogo gostariamos que você informace a velocidade do tiro: \n");
   fscanf("%d", &us.bulletSpeed);*/
   
   enemy.x = 275;
-  enemy.y = 60;
+  enemy.y = 125;
   enemy.facingLeft = 1;
   enemy.currentSprite = 4;
   enemy.alive = 1;
   enemy.qntTiros = 0;
-  
-  window = SDL_CreateWindow("IHMHR Game",                     // window title
+  enemy.life = 3; 
+  window = SDL_CreateWindow("IHMHR AI Game",                   // window title
                             SDL_WINDOWPOS_UNDEFINED,           // initial x position
                             SDL_WINDOWPOS_UNDEFINED,           // initial y position
                             640,                               // width, in pixels
@@ -488,17 +464,17 @@ int main( int argc, char* args[] )
   SDL_FreeSurface(sheet);
 
   //load the bg  
-  SDL_Surface *bg = IMG_Load("background.png");
+  //SDL_Surface *bg = IMG_Load("background.png");
+  SDL_Surface *bg = IMG_Load("TunnelPlateformHandPainted.jpg");
   
-  if(!sheet)
+  if(!bg)
   {
     printf("Cannot find background\n%s\n", SDL_GetError());
     return 1;
   }
   
   backgroundTexture = SDL_CreateTextureFromSurface(renderer, bg);
-  SDL_FreeSurface(bg);
-  
+  SDL_FreeSurface(bg);  
   
 
   //load the bg  
@@ -512,7 +488,8 @@ int main( int argc, char* args[] )
   
   bulletTexture = SDL_CreateTextureFromSurface(renderer, bullet);
   SDL_FreeSurface(bullet);
-
+  //system("cls");
+  
   // The window is open: enter program loop (see SDL_PollEvent)
   int done = 0;
   
@@ -528,25 +505,25 @@ int main( int argc, char* args[] )
 		{
 			tmp++;
 			enemy.shooting = 0;
-		  	enemyShooting(0, man.x);
+		  	enemyShooting(0, man.x, atirando);
 		}
 		
 		if(enemy.qntTiros > 10)
 		{
 			enemy.shooting = 0;
-			enemyShooting(0, man.x);
+			enemyShooting(0, man.x, atirando);
 		}
 		if(enemy.qntTiros > 40)
 		{
 			enemy.shooting = 0;
-			enemyShooting(0, man.x);
+			enemyShooting(0, man.x, atirando);
 		}
 		if(enemy.qntTiros > 60)
 		{
 			for(k = 0; k < 2; k++)
 			{
 				enemy.shooting = 0;
-				enemyShooting(0, man.x);
+				enemyShooting(0, man.x, atirando);
 			}
 		}
 		if(enemy.qntTiros > 100)
@@ -554,7 +531,7 @@ int main( int argc, char* args[] )
 			for(k = 0; k < 5; k++)
 			{
 				enemy.shooting = 0;
-				enemyShooting(1, man.x);
+				enemyShooting(1, man.x, atirando);
 			}
 		}
 		if(enemy.qntTiros > 300)
@@ -562,13 +539,11 @@ int main( int argc, char* args[] )
 			for(k = 0; k < 10; k++)
 			{
 				enemy.shooting = 0;
-				enemyShooting(2, man.x);
+				enemyShooting(2, man.x, atirando);
 		 	}
 		}
 		enemy.shooting = 0;
 		
-		
-		//if(globalTime % 5 == 0 && enemy.x > 5)
 		if(enemy.facingLeft)
 	    {
 			enemy.currentSprite++;
@@ -579,7 +554,7 @@ int main( int argc, char* args[] )
       			enemy.facingLeft = 0;
 			}
     	}
-    	else if(!enemy.facingLeft) /*if(globalTime % 5 == 0 && enemy.x <= 5)*/
+    	else if(!enemy.facingLeft)
     	{
     		enemy.currentSprite++;
     		enemy.facingLeft = 0;
@@ -598,7 +573,7 @@ int main( int argc, char* args[] )
 	}
   	
     //Check for events
-    done = processEvents(window, &man);
+    done = processEvents(window, &man, atirando);
     
     //Update logic
     updateLogic(&man);
@@ -615,19 +590,19 @@ int main( int argc, char* args[] )
     {
     	if(enemy.alive)
     	{
-    		printf("\n\n\n\n\n\n\n\n\n\t\t\tGAME OVER, CUZÃO !");
-    		printf("\n\n\n\n\n\n\n\n\n");
+    		printf("\n\n\n\n\n\n\n\n\n\n\t\t\t\tGAME OVER, CUZÃO !");
+    		printf("\n\n\n\n\n\n\n\n\n\n\n\n");
 		}
 		else
 		{
-			printf("\n\n\n\n\n\n\n\n\n\t\t\tIT'S TOO EASY...");
-			printf("\n\n\n\n\n\n\n\n\n");
+			printf("\n\n\n\n\n\n\n\n\n\n\t\t\t\tIT'S TOO EASY...");
+			printf("\n\n\n\n\n\n\n\n\n\n\n\n");
 		}
 		done = 1;
 	}
     
     i++;
-  } 
+  }
   
   // Close and destroy the window
   SDL_DestroyWindow(window);
@@ -636,6 +611,7 @@ int main( int argc, char* args[] )
   SDL_DestroyTexture(backgroundTexture);
   SDL_DestroyTexture(bulletTexture);
   SDL_DestroyTexture(enemy.sheetTexture);
+  Mix_FreeChunk(atirando);
 
   removeAllBullets();
 
