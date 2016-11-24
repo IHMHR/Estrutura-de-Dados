@@ -1,6 +1,6 @@
 /*
  ============================================================================
- Name        : ProjetoCompleto.c
+ Name        : Arvore.c
  Author      : IHMHR
  Version     :
  Copyright   : Your copyright notice
@@ -8,147 +8,82 @@
  ============================================================================
  */
 
-#include "lista.h"
+#include <stdio.h>
+#include <stdlib.h>
 
-typedef struct pilha Tpilha;
-typedef struct fila Tfila;
+typedef struct arvore tree;
 
-struct pilha
+struct arvore
 {
-	Tlista *topo;
+	tree *esq;
+	char dado;
+	tree *dir;
 };
 
-struct fila
+tree* criaVazia()
 {
-	Tlista *inicio;
-	Tlista *final;
-};
+	return NULL;
+}
 
-Tpilha* inicializarPilha()
+tree* criaNo(char letra, tree *esquerda, tree *direita)
 {
-	Tpilha *aux = (Tpilha*) malloc(sizeof(Tpilha));
-	aux->topo = NULL;
+	tree *aux = (tree *) malloc(sizeof(tree));
+	aux->dado = letra;
+	aux->esq = esquerda;
+	aux->dir = direita;
 	return aux;
 }
 
-void pushPilha(Tpilha *pilha, char letra)
+void imprimirArvore(tree *arv)
 {
-	pilha->topo = inserir(pilha->topo, letra);
-}
+	printf("(%c", arv->dado);
 
-void imprimirPilha(Tpilha *pilha)
-{
-	imprime(pilha->topo);
-}
-
-void popPilha(Tpilha *pilha)
-{
-	pilha->topo = removeLista(pilha->topo, pilha->topo->dado);
-}
-
-void liberaPilha(Tpilha *pilha)
-{
-	pilha->topo = liberaCircular(pilha->topo);
-}
-
-int isPilhaVazia(Tpilha *pilha)
-{
-	return isListavazia(pilha->topo);
-}
-
-Tpilha* buscaPilha(Tpilha *pilha, char letra)
-{
-	return (Tlista *) BuscaCircular(pilha->topo, letra);
-}
-
-Tfila* inicializarFila()
-{
-	Tfila *aux = (Tfila *) malloc(sizeof(Tfila));
-	aux->inicio = aux->final = NULL;
-	return aux;
-}
-
-int isFilaVazia(Tfila *fila)
-{
-	return isListavazia(fila->inicio);
-}
-
-void inserirFila(Tfila *fila, char letra)
-{
-	if(isFilaVazia(fila))
+	if(arv->esq != NULL)
 	{
-		// inicio e final recebem a mesma Lista
-		fila->inicio = fila->final = inserir(NULL, letra);
+		// go deep on left size
+		imprimirArvore(arv->esq);
 	}
 	else
 	{
-		Tlista *aux = inserir(fila->inicio, letra);
-		fila->final->prox = aux;
-		fila->final = aux;
+		printf("(_)");
 	}
-}
 
-void imprimirFila(Tfila *fila)
-{
-	imprime(fila->inicio);
-}
-
-void removeFila(Tfila *fila)
-{
-	// remover no inicio
-	if(isFilaVazia(fila))
+	if(arv->dir != NULL)
 	{
-		fila = inicializarFila();
+		// go deep on right size
+		imprimirArvore(arv->dir);
 	}
 	else
 	{
-		Tlista *aux = fila->inicio;
-		fila->inicio = fila->inicio->prox;
-		free(aux);
+		printf("(_)");
 	}
-}
-
-void liberarFila(Tfila *fila)
-{
-
+	printf(")");
 }
 
 int main()
 {
-	/*Tpilha *pilhaUsuario = inicializarPilha();
+	tree *arvore = criaVazia();
 
-	pushPilha(pilhaUsuario, 'F');
-	pushPilha(pilhaUsuario, 'A');
-	pushPilha(pilhaUsuario, 'C');
-	pushPilha(pilhaUsuario, 'E');
+	arvore = criaNo('M', criaNo('H', criaNo('E', criaNo('C', criaNo('A', criaVazia(), criaVazia()),criaNo('D', criaVazia(), criaVazia())), criaNo('G', criaVazia(), criaVazia())), criaNo('K', criaVazia(), criaNo('L', criaVazia(), criaVazia()))), criaNo('R', criaNo('O', criaNo('N', criaVazia(), criaVazia()), criaVazia()), criaNo('T', criaVazia(), criaVazia())));
 
-	imprimirPilha(pilhaUsuario);
-
-	popPilha(pilhaUsuario);
+	/*printf("	%c", arvore->dado);
 	printf("\n");
+	printf("%c", arvore->esq->dado);
+	printf("		%c", arvore->dir->dado);
+	printf("\n\n\n");*/
 
-	imprimirPilha(pilhaUsuario);
+	imprimirArvore(arvore);
 
-	liberaPilha(pilhaUsuario);
-	printf("\n");
-
-	imprimirPilha(pilhaUsuario);*/
-
-	Tfila *filaUsuario = inicializarFila();
-
-	inserirFila(filaUsuario, 'F');
-	inserirFila(filaUsuario, 'A');
-	inserirFila(filaUsuario, 'C');
-	inserirFila(filaUsuario, 'E');
-
-	imprimirFila(filaUsuario);
-
-	removeFila(filaUsuario);
-
-	printf("\n----------------------------\n");
-
-	imprimirFila(filaUsuario);
-
+	printf("\n(M(H(E(C(A(_)(_))(D(_)(_)))(G(_)(_)))(K(_)(L(_)(_))))(R(O(N(_)(_))(_))(T(_)(_))))");
 
 	return 0;
 }
+
+/*
+						  ARVORE BINÁRIA
+								M
+					H						R
+				E		L				O		T
+			C		G				N
+		A		D
+*/
