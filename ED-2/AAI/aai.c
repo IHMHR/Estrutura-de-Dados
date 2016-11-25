@@ -2,13 +2,12 @@
 #include "SDL2/SDL_mixer.h"
 #include <stdio.h>
 #include <locale.h>
+#include <pthread.h>
 
 #define MUNICAO 30
 
 /*
--lmingw32 -lSDL2main -lSDL2 -lSDL2_image
--SDL2_mixer
--lmingw32 -lSDL2main -lSDL2 -lSDL2_image -SDL2_mixer
+-lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_mixer
 */
 
 typedef struct
@@ -207,7 +206,7 @@ int processEvents(SDL_Window *window, Man *man, Mix_Chunk *atirando)
   }
   if(state[SDL_SCANCODE_DOWN])
   {
-    //man->y += 10;
+    //man->y += 8;
   }
   
   return done;
@@ -395,14 +394,23 @@ void enemyShooting(int i, int wX, Mix_Chunk *atirando)
   }
 }
 
+void * StartGame()
+{
+	Mix_Chunk *start = Mix_LoadWAV("startgame.wav");
+  	Mix_PlayChannel(-1, start, 0);
+}
+
 int main( int argc, char* args[] ) 
 {
   setlocale(LC_ALL, "Portuguese");
   
   Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048);
   Mix_Chunk *atirando = Mix_LoadWAV("gunsshot.wav");
-  Mix_Chunk *start = Mix_LoadWAV("startgame.wav");
-  Mix_PlayChannel(-1, start, 0);
+  
+  pthread_t t1;
+  pthread_create(&t1, 0, StartGame, 0);
+  pthread_join(t1, 0);
+  SDL_Delay(350);
   
   SDL_Window *window;                    	  // Declare a window
   SDL_Renderer *renderer;                	  // Declare a renderer
@@ -416,6 +424,7 @@ int main( int argc, char* args[] )
   man.facingLeft = 0;
   man.alive = 1;
   man.qntTiros = 0;
+  man.life = 3;
   us.bulletSpeed = 5;
   /*printf("\t\t\t\tOlá, seja bem vindo !");
   printf("\nPrimeiramente, qual seu nome ?\n");
@@ -488,7 +497,7 @@ int main( int argc, char* args[] )
   
   bulletTexture = SDL_CreateTextureFromSurface(renderer, bullet);
   SDL_FreeSurface(bullet);
-  //system("cls");
+  system("cls");
   
   // The window is open: enter program loop (see SDL_PollEvent)
   int done = 0;
@@ -501,7 +510,7 @@ int main( int argc, char* args[] )
   {
   	if(i % 30 == 0)
   	{
-  		if(i == m*tmp) /* NEVER STOP SHOOTING */
+  		if(i == m*tmp)
 		{
 			tmp++;
 			enemy.shooting = 0;
