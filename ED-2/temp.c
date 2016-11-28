@@ -60,6 +60,22 @@ void imprimirArvore(tree *arv)
 	printf(")");
 }
 
+tree* insereArv(tree *arv, char letra)
+{
+}
+
+int pertence(tree *arv, char letra)
+{
+}
+
+tree* busca(tree *arv, char letra)
+{
+}
+
+tree* removeArv(tree *arv, char letra)
+{
+}
+
 int main()
 {
 	tree *arvore = criaVazia();
