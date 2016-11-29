@@ -123,14 +123,61 @@ void imprimirArvoreOrdem(tree *arv)
 
 tree* insereArv(tree *arv, char letra)
 {
+	if(arv == NULL)
+	{
+		arv = criaNo(letra, arv, arv);
+	}
+	else
+	{
+		if(letra > arv->dado)
+		{
+			//direita
+			arv->dir = insereArv(arv->dir, letra);
+		}
+		else
+		{
+			//esquerda
+			arv->esq = insereArv(arv->esq, letra);
+		}
+	}
+	return arv;
 }
 
 int pertence(tree *arv, char letra)
 {
+	/* ERRO */
+	if(arv->dado == letra)
+	{
+		return 1;
+	}
+	else
+	{
+		if(arv->esq != NULL)
+		{
+			pertence(arv->esq, letra);
+		}
+
+		if(arv->dir != NULL)
+		{
+			pertence(arv->dir, letra);
+		}
+	}
+	return 0;
 }
 
 tree* busca(tree *arv, char letra)
 {
+	if(arv != NULL)
+	{
+		if(arv->dado == letra)
+		{
+			return arv;
+		}
+		busca(arv->esq, letra);
+		busca(arv->dir, letra);
+	}
+
+	return NULL;
 }
 
 tree* removeArv(tree *arv, char letra)
@@ -141,11 +188,34 @@ int main()
 {
 	tree *arvore = criaVazia();
 
-	arvore = criaNo('M', criaNo('H', criaNo('E', criaNo('C', criaNo('A', criaVazia(), criaVazia()),criaNo('D', criaVazia(), criaVazia())), criaNo('G', criaVazia(), criaVazia())), criaNo('K', criaVazia(), criaNo('L', criaVazia(), criaVazia()))), criaNo('R', criaNo('O', criaNo('N', criaVazia(), criaVazia()), criaVazia()), criaNo('T', criaVazia(), criaVazia())));
+	//arvore = criaNo('M', criaNo('H', criaNo('E', criaNo('C', criaNo('A', criaVazia(), criaVazia()),criaNo('D', criaVazia(), criaVazia())), criaNo('G', criaVazia(), criaVazia())), criaNo('K', criaVazia(), criaNo('L', criaVazia(), criaVazia()))), criaNo('R', criaNo('O', criaNo('N', criaVazia(), criaVazia()), criaVazia()), criaNo('T', criaVazia(), criaVazia())));
 
-	imprimirArvoreOrdem(arvore);
+	/* AROVRE */
+	arvore = insereArv(arvore, 'M');
+
+	arvore = insereArv(arvore, 'R');
+	arvore = insereArv(arvore, 'H');
+
+	arvore = insereArv(arvore, 'O');
+	arvore = insereArv(arvore, 'K');
+	arvore = insereArv(arvore, 'T');
+	arvore = insereArv(arvore, 'E');
+
+	arvore = insereArv(arvore, 'L');
+	arvore = insereArv(arvore, 'G');
+	arvore = insereArv(arvore, 'N');
+	arvore = insereArv(arvore, 'C');
+
+	arvore = insereArv(arvore, 'D');
+	arvore = insereArv(arvore, 'A');
+	/* AROVRE */
+
+	imprimirArvore(arvore);
 
 	printf("\n(M(H(E(C(A(_)(_))(D(_)(_)))(G(_)(_)))(K(_)(L(_)(_))))(R(O(N(_)(_))(_))(T(_)(_))))");
+
+	printf("\nPertence H na arvore = %d", pertence(arvore, 'H'));
+	printf("\nPertence X na arvore = %d", pertence(arvore, 'X'));
 
 	return 0;
 }
