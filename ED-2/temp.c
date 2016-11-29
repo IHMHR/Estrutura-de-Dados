@@ -36,28 +36,89 @@ tree* criaNo(char letra, tree *esquerda, tree *direita)
 
 void imprimirArvore(tree *arv)
 {
-	printf("(%c", arv->dado);
+	//Pre Ordem
+	if(NULL != arv)
+	{
+		printf("(%c", arv->dado);
 
-	if(arv->esq != NULL)
-	{
-		// go deep on left size
-		imprimirArvore(arv->esq);
-	}
-	else
-	{
-		printf("(_)");
-	}
+		if(arv->esq != NULL)
+		{
+			// go deep on left size
+			imprimirArvore(arv->esq);
+		}
+		else
+		{
+			printf("(_)");
+		}
 
-	if(arv->dir != NULL)
-	{
-		// go deep on right size
-		imprimirArvore(arv->dir);
+		if(arv->dir != NULL)
+		{
+			// go deep on right size
+			imprimirArvore(arv->dir);
+		}
+		else
+		{
+			printf("(_)");
+		}
+		printf(")");
 	}
-	else
+}
+
+void imprimirArvorePos(tree *arv)
+{
+	//Pos Ordem
+	if(NULL != arv)
 	{
-		printf("(_)");
+		printf("(");
+		if(arv->esq != NULL)
+		{
+			// go deep on left size
+			imprimirArvorePos(arv->esq);
+		}
+		else
+		{
+			printf("(_)");
+		}
+
+		if(arv->dir != NULL)
+		{
+			// go deep on right size
+			imprimirArvorePos(arv->dir);
+		}
+		else
+		{
+			printf("(_)");
+		}
+		printf("%c)", arv->dado);
 	}
-	printf(")");
+}
+
+void imprimirArvoreOrdem(tree *arv)
+{
+	//Ordem
+	if(NULL != arv)
+	{
+		printf("(");
+		if(arv->esq != NULL)
+		{
+			// go deep on left size
+			imprimirArvoreOrdem(arv->esq);
+		}
+		else
+		{
+			printf("(_)");
+		}
+		printf("%c)", arv->dado);
+		if(arv->dir != NULL)
+		{
+			// go deep on right size
+			imprimirArvoreOrdem(arv->dir);
+		}
+		else
+		{
+			printf("(_)");
+		}
+	}
 }
 
 tree* insereArv(tree *arv, char letra)
@@ -82,13 +143,7 @@ int main()
 
 	arvore = criaNo('M', criaNo('H', criaNo('E', criaNo('C', criaNo('A', criaVazia(), criaVazia()),criaNo('D', criaVazia(), criaVazia())), criaNo('G', criaVazia(), criaVazia())), criaNo('K', criaVazia(), criaNo('L', criaVazia(), criaVazia()))), criaNo('R', criaNo('O', criaNo('N', criaVazia(), criaVazia()), criaVazia()), criaNo('T', criaVazia(), criaVazia())));
 
-	/*printf("	%c", arvore->dado);
-	printf("\n");
-	printf("%c", arvore->esq->dado);
-	printf("		%c", arvore->dir->dado);
-	printf("\n\n\n");*/
-
-	imprimirArvore(arvore);
+	imprimirArvoreOrdem(arvore);
 
 	printf("\n(M(H(E(C(A(_)(_))(D(_)(_)))(G(_)(_)))(K(_)(L(_)(_))))(R(O(N(_)(_))(_))(T(_)(_))))");
 
@@ -99,7 +154,7 @@ int main()
 						  ARVORE BINÁRIA
 								M
 					H						R
-				E		L				O		T
-			C		G				N
+				E		K				O		T
+			C		G		L		N
 		A		D
 */
