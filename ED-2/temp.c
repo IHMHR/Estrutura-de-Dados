@@ -145,36 +145,42 @@ tree* insereArv(tree *arv, char letra)
 
 int pertence(tree *arv, char letra)
 {
-	/* ERRO */
+	/* +/- */
 	if(arv->dado == letra)
 	{
 		return 1;
 	}
+	else if(arv->esq != NULL)
+	{
+		return pertence(arv->esq, letra);
+	}
+	else if(arv->dir != NULL)
+	{
+		return pertence(arv->dir, letra);
+	}
 	else
 	{
-		if(arv->esq != NULL)
-		{
-			pertence(arv->esq, letra);
-		}
-
-		if(arv->dir != NULL)
-		{
-			pertence(arv->dir, letra);
-		}
+		return 0;
 	}
-	return 0;
 }
 
 tree* busca(tree *arv, char letra)
 {
 	if(arv != NULL)
 	{
+		if(arv->esq != NULL)
+		{
+			busca(arv->esq, letra);
+		}
+		if(arv->esq != NULL)
+		{
+			busca(arv->dir, letra);
+		}
+
 		if(arv->dado == letra)
 		{
 			return arv;
 		}
-		busca(arv->esq, letra);
-		busca(arv->dir, letra);
 	}
 
 	return NULL;
@@ -212,10 +218,17 @@ int main()
 
 	imprimirArvore(arvore);
 
-	printf("\n(M(H(E(C(A(_)(_))(D(_)(_)))(G(_)(_)))(K(_)(L(_)(_))))(R(O(N(_)(_))(_))(T(_)(_))))");
+	printf("\n(M(H(E(C(A(_)(_))(D(_)(_)))(G(_)(_)))(K(_)(L(_)(_))))(R(O(N(_)(_))(_))(T(_)(_))))\n");
+
+	printf("\n%d\n%d", 'H', 'X');
 
 	printf("\nPertence H na arvore = %d", pertence(arvore, 'H'));
 	printf("\nPertence X na arvore = %d", pertence(arvore, 'X'));
+
+	/*tree *arvoreBusca = criaVazia();
+	arvoreBusca = busca(arvore, 'C');
+
+	imprimirArvore(arvoreBusca);*/
 
 	return 0;
 }
