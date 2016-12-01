@@ -185,6 +185,35 @@ tree* busca(tree *arv, char letra)
 
 tree* removeArv(tree *arv, char letra)
 {
+	if(arv == NULL)
+	{
+		return criaVazia();
+	}
+	else if(arv->dado == letra && isFolha(arv))
+	{
+		free(arv);
+		arv = criaVazia();
+		return arv;
+	}
+	else if(arv->dado == letra && ((arv->esq == NULL) ^ (arv->dir == NULL))) // 1 filho
+	{
+		tree *aux = arv;
+		if(arv->esq != NULL)
+		{
+			arv = arv->esq;
+		}
+		else
+		{
+			arv = arv->dir;
+		}
+		free(aux);
+		return arv;
+	}
+	else
+	{
+		// TODO
+		return criaVazia();
+	}
 }
 
 int main()
