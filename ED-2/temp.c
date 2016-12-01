@@ -165,24 +165,22 @@ int pertence(tree *arv, char letra)
 
 tree* busca(tree *arv, char letra)
 {
-	if(arv != NULL)
+	if(arv->dado == letra)
 	{
-		if(arv->esq != NULL)
-		{
-			busca(arv->esq, letra);
-		}
-		if(arv->esq != NULL)
-		{
-			busca(arv->dir, letra);
-		}
-
-		if(arv->dado == letra)
-		{
-			return arv;
-		}
+		return arv;
 	}
-
-	return NULL;
+	else if(arv->esq != NULL && letra < arv->dado)
+	{
+		return busca(arv->esq, letra);
+	}
+	else if(arv->dir != NULL && letra > arv->dado)
+	{
+		return busca(arv->dir, letra);
+	}
+	else
+	{
+		return NULL;
+	}
 }
 
 tree* removeArv(tree *arv, char letra)
