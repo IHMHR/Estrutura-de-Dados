@@ -211,7 +211,12 @@ tree* removeArv(tree *arv, char letra)
 	}
 	else
 	{
-		// TODO
+		// tenho q achar um elemento mais 'abaixo' na arv
+		// q é maior q o elemento da esq e menor q o dir
+		// apos encontrar-lo tenho que reposicionar-lo
+		// fazndo ele ficar no lugar do elemento q vai sair
+		// e caso tenha filhos, fazer os filhos ser ligados
+		// com os ancestais mais proximos
 		return criaVazia();
 	}
 }
