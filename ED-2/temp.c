@@ -145,16 +145,15 @@ tree* insereArv(tree *arv, char letra)
 
 int pertence(tree *arv, char letra)
 {
-	/* +/- */
 	if(arv->dado == letra)
 	{
 		return 1;
 	}
-	else if(arv->esq != NULL)
+	else if(arv->esq != NULL && letra < arv->dado)
 	{
 		return pertence(arv->esq, letra);
 	}
-	else if(arv->dir != NULL)
+	else if(arv->dir != NULL && letra > arv->dado)
 	{
 		return pertence(arv->dir, letra);
 	}
