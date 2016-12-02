@@ -187,38 +187,55 @@ tree* removeArv(tree *arv, char letra)
 {
 	if(arv == NULL)
 	{
-		return criaVazia();
-	}
-	else if(arv->dado == letra && isFolha(arv))
-	{
-		free(arv);
-		arv = criaVazia();
 		return arv;
 	}
-	else if(arv->dado == letra && ((arv->esq == NULL) ^ (arv->dir == NULL))) // 1 filho
+	else if(letra > arv->dado)
 	{
-		tree *aux = arv;
-		if(arv->esq != NULL)
-		{
-			arv = arv->esq;
-		}
-		else
-		{
-			arv = arv->dir;
-		}
-		free(aux);
-		return arv;
+		arv->dir = removeArv(arv->dir, letra);
+	}
+	else if(letra < arv->dado)
+	{
+		arv->esq = removeArv(arv->esq, letra);
 	}
 	else
 	{
-		// tenho q achar um elemento mais 'abaixo' na arv
-		// q é maior q o elemento da esq e menor q o dir
-		// apos encontrar-lo tenho que reposicionar-lo
-		// fazndo ele ficar no lugar do elemento q vai sair
-		// e caso tenha filhos, fazer os filhos ser ligados
-		// com os ancestais mais proximos
-		return criaVazia();
+		// estamos no dado
+		if(arv->esq == NULL && arv->dir == NULL)
+		{
+			free(arv);
+			arv = criaVazia();
+		}
+		else if(arv->dir == NULL)
+		{
+			tree *aux = arv;
+			arv = arv->esq;
+			free(aux);
+		}
+		else if(arv->esq == NULL)
+		{
+			tree *aux = arv;
+			arv = arv->dir;
+			free(aux);
+		}
+		else
+		{
+			// 2 filhos
+			tree *aux = arv->esq;
+			while(aux->dir != NULL)
+			{
+				aux = aux->dir;
+			}
+
+			// fazer a troca
+			char auxch = arv->dado;
+			arv->dado = aux->dado;
+			aux->dado = auxch;
+
+			arv->esq = removeArv(arv->esq, letra);
+		}
 	}
+
+	return arv;
 }
 
 int main()
@@ -254,12 +271,19 @@ int main()
 	printf("\n%d\n%d", 'H', 'X');
 
 	printf("\nPertence H na arvore = %d", pertence(arvore, 'H'));
-	printf("\nPertence X na arvore = %d", pertence(arvore, 'X'));
+	printf("\nPertence X na arvore = %d\n", pertence(arvore, 'X'));
 
 	/*tree *arvoreBusca = criaVazia();
 	arvoreBusca = busca(arvore, 'C');
 
 	imprimirArvore(arvoreBusca);*/
+
+	/*arvore = removeArv(arvore, 'D');
+	arvore = removeArv(arvore, 'K');
+	arvore = removeArv(arvore, 'O');*/
+	arvore = removeArv(arvore, 'M');
+
+	imprimirArvore(arvore);
 
 	return 0;
 }
