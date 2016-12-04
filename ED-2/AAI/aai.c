@@ -3,8 +3,12 @@
 #include <stdio.h>
 #include <locale.h>
 #include <pthread.h>
+#include <stdlib.h>
+#include <time.h>
 
 #define MUNICAO 30
+#define MAX_SANGUE 1000
+#define GRAVIDADE 0.5f
 
 /*
 -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_mixer
@@ -13,7 +17,6 @@
 typedef struct
 {
 	int bulletSpeed;
-	char *nome;
 	
 } usuario;
 
@@ -35,9 +38,17 @@ typedef struct
 	char belongs;
 } Bullet;
 
+typedef struct
+{
+	float x, y, dy, dx;
+	float life;
+} Particle;
+
 SDL_Texture *bulletTexture;
 SDL_Texture *backgroundTexture;
+SDL_Texture *particleTexture;
 Bullet *bullets[MUNICAO] = { NULL };
+Particle *sangue[MAX_SANGUE] = { NULL };
 Man enemy;
 
 int globalTime = 0;
@@ -76,10 +87,83 @@ void removeAllBullets()
 	int i;
 	for(i = 0; i < MUNICAO; i++)
 	{
-		removeBullet(i);
+		if(bullets[i])
+		{
+			removeBullet(i);
+		}
 	}
 }
 
+void addParticle(float ex, float ey, float energy, int numParticle)
+{
+	int j;
+	for(j = 0; j < numParticle; j++)
+	{
+		int i;
+		int found = -1;
+		for(i = 0; i < MAX_SANGUE; i++)
+		{
+			if(sangue[i] == NULL)
+			{
+				found = i;
+				break;
+			}
+		}
+	
+		if(found >= 0)
+		{
+			i = found;
+			sangue[i] = (Particle*) malloc(sizeof(Particle));
+			sangue[i]->x = ex;
+			sangue[i]->y = ey;
+		
+			float dy, dx;
+			dx = (((float)rand() / RAND_MAX) - 0.5f) * energy;
+			dy = (((float)rand() / RAND_MAX) - 0.5f) * energy;
+			//sangue[i]->dx = dx;
+			//sangue[i]->dy = dy;
+			sangue[i]->life = 175 ;
+		}
+	}
+}
+
+void processParticle()
+{
+	int i = 0;
+	for(i = 0; i < MAX_SANGUE; i++)
+	{
+		if(sangue[i])
+		{
+			sangue[i]->x += sangue[i]->dx;
+			sangue[i]->y += sangue[i]->dy;
+			//sangue[i]->dy += GRAVIDADE*0.1f;
+			sangue[i]->life--;
+			
+			if(sangue[i]->life <= 0)
+			{
+				removeParticle(i);
+			}
+		}
+	}
+}
+
+void removeParticle(int i)
+{
+	free(sangue[i]);
+	sangue[i] = NULL;
+}
+
+void removeAllParticle()
+{
+	int i;
+	for(i = 0; i < MAX_SANGUE; i++)
+	{
+		if(sangue[i])
+		{
+			removeParticle(i);
+		}
+	}
+}
 
 int processEvents(SDL_Window *window, Man *man, Mix_Chunk *atirando)
 {
@@ -174,13 +258,13 @@ int processEvents(SDL_Window *window, Man *man, Mix_Chunk *atirando)
 	    
 	    	if(man->qntTiros <= MUNICAO)
 	    	{
-				if(!man->facingLeft)
+				if(!man->facingLeft && man->alive)
 	    		{
 	    			man->qntTiros++;
 	    			Mix_PlayChannel(-1, atirando, 0);
 					addBullet(man->x+35, man->y+20, us.bulletSpeed, 'W');
 				}
-				else
+				else if(man->alive)
 				{
 					man->qntTiros++;
 					Mix_PlayChannel(-1, atirando, 0);
@@ -251,16 +335,31 @@ void doRender(SDL_Renderer *renderer, Man *man)
   		SDL_RenderCopy(renderer, bulletTexture, NULL, &rect);
 	}
   }
+  
+  for(i = 0; i < MAX_SANGUE; i++)
+  {
+  	if(sangue[i])
+  	{
+  		SDL_Rect rect = { sangue[i]->x, sangue[i]->y, 100, 100 };  
+  		SDL_RenderCopy(renderer, particleTexture, NULL, &rect);
+	}
+  }
 
   
   //We are done drawing, "present" or show to the screen what we've drawn
   SDL_RenderPresent(renderer);
 }
 
+void * bomba()
+{
+	Mix_Chunk *bomb = Mix_LoadWAV("bombSound.wav");
+	Mix_PlayChannel(-1, bomb, 0);
+}
+
 void updateLogic(Man *man)
 {
   man->y += man->dy;
-  man->dy += 0.5;
+  man->dy += GRAVIDADE;
   if(man->y > 125)
   {
     man->y = 125;
@@ -274,18 +373,34 @@ void updateLogic(Man *man)
   	{
  		bullets[i]->x += bullets[i]->dx;
  
+ 		pthread_t t1;
+ 
 		if(bullets[i]->x > enemy.x && bullets[i]->x < enemy.x+40 &&
 		   bullets[i]->y > enemy.y && bullets[i]->x < enemy.x+50 &&
 		   bullets[i]->belongs == 'W')
   		{
-  			enemy.alive = 0;
+  			if(enemy.alive)
+  			{
+  				pthread_create(&t1, 0, bomba, 0);
+  				pthread_join(t1, 0);
+  				
+  				addParticle(enemy.x, enemy.y-50, 4.0, 100);
+			  	enemy.alive = 0;
+			}
 		}
 
 		if(bullets[i]->x > man->x && bullets[i]->x < man->x+40 &&
 		   bullets[i]->y > man->y && bullets[i]->x < man->x+50 &&
 		   (man->y - bullets[i]->y) > -25 && bullets[i]->belongs == 'E')
   		{
-  			man->alive = 0;
+  			if(man->alive)
+  			{
+  				pthread_create(&t1, 0, bomba, 0);
+  				pthread_join(t1, 0);
+  				
+  				addParticle(man->x, man->y-50, 4.0, 100);
+			  	man->alive = 0;
+			}
 		}
   		
   		if(bullets[i]->x < -1000 || bullets[i]->x > 1000)
@@ -311,6 +426,8 @@ void updateLogic(Man *man)
 		}
 	}
   }
+  
+  processParticle();
   
   globalTime++;
 }
@@ -402,7 +519,7 @@ void * StartGame()
 
 int main( int argc, char* args[] ) 
 {
-  setlocale(LC_ALL, "Portuguese");
+  srand(time(0));
   
   Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048);
   Mix_Chunk *atirando = Mix_LoadWAV("gunsshot.wav");
@@ -426,12 +543,6 @@ int main( int argc, char* args[] )
   man.qntTiros = 0;
   man.life = 3;
   us.bulletSpeed = 5;
-  /*printf("\t\t\t\tOlá, seja bem vindo !");
-  printf("\nPrimeiramente, qual seu nome ?\n");
-  gets(us.nome);
-  printf("\n%s", us.nome);
-  printf("\n%s, para configuar o jogo gostariamos que você informace a velocidade do tiro: \n");
-  fscanf("%d", &us.bulletSpeed);*/
   
   enemy.x = 275;
   enemy.y = 125;
@@ -440,7 +551,7 @@ int main( int argc, char* args[] )
   enemy.alive = 1;
   enemy.qntTiros = 0;
   enemy.life = 3; 
-  window = SDL_CreateWindow("IHMHR AI Game",                   // window title
+  window = SDL_CreateWindow("IHMHR AAI Game",                   // window title
                             SDL_WINDOWPOS_UNDEFINED,           // initial x position
                             SDL_WINDOWPOS_UNDEFINED,           // initial y position
                             640,                               // width, in pixels
@@ -486,7 +597,6 @@ int main( int argc, char* args[] )
   SDL_FreeSurface(bg);  
   
 
-  //load the bg  
   SDL_Surface *bullet = IMG_Load("bullet.png");
     
   if(!bullet)
@@ -497,37 +607,49 @@ int main( int argc, char* args[] )
   
   bulletTexture = SDL_CreateTextureFromSurface(renderer, bullet);
   SDL_FreeSurface(bullet);
+  
+  //SDL_Surface *particle = IMG_Load("blood.png");
+  SDL_Surface *particle = IMG_Load("particle.png");
+    
+  if(!particle)
+  {
+    printf("Cannot find particle\n%s\n", SDL_GetError());
+    return 1;
+  }
+  
+  particleTexture = SDL_CreateTextureFromSurface(renderer, particle);
+  SDL_FreeSurface(particle);
+  
   system("cls");
   
   // The window is open: enter program loop (see SDL_PollEvent)
   int done = 0;
   
-  int i = 0, tmp = 1, m = 120;
-  int k = 0;
+  int i = 0, tmp = 1, m = 120, k = 0;
   
   //Event loop
   while(!done)
   {
   	if(i % 30 == 0)
   	{
-  		if(i == m*tmp)
+  		if(i == m*tmp && man.alive)
 		{
 			tmp++;
 			enemy.shooting = 0;
 		  	enemyShooting(0, man.x, atirando);
 		}
 		
-		if(enemy.qntTiros > 10)
+		if(enemy.qntTiros > 10 && man.alive)
 		{
 			enemy.shooting = 0;
 			enemyShooting(0, man.x, atirando);
 		}
-		if(enemy.qntTiros > 40)
+		if(enemy.qntTiros > 40 && man.alive)
 		{
 			enemy.shooting = 0;
 			enemyShooting(0, man.x, atirando);
 		}
-		if(enemy.qntTiros > 60)
+		if(enemy.qntTiros > 60 && man.alive)
 		{
 			for(k = 0; k < 2; k++)
 			{
@@ -535,7 +657,7 @@ int main( int argc, char* args[] )
 				enemyShooting(0, man.x, atirando);
 			}
 		}
-		if(enemy.qntTiros > 100)
+		if(enemy.qntTiros > 100 && man.alive)
 		{
 			for(k = 0; k < 5; k++)
 			{
@@ -543,7 +665,7 @@ int main( int argc, char* args[] )
 				enemyShooting(1, man.x, atirando);
 			}
 		}
-		if(enemy.qntTiros > 300)
+		if(enemy.qntTiros > 300 && man.alive)
 		{
 			for(k = 0; k < 10; k++)
 			{
@@ -553,7 +675,7 @@ int main( int argc, char* args[] )
 		}
 		enemy.shooting = 0;
 		
-		if(enemy.facingLeft)
+		if(enemy.facingLeft && man.alive)
 	    {
 			enemy.currentSprite++;
       		enemy.currentSprite %= 4;
@@ -563,7 +685,7 @@ int main( int argc, char* args[] )
       			enemy.facingLeft = 0;
 			}
     	}
-    	else if(!enemy.facingLeft)
+    	else if(!enemy.facingLeft && man.alive)
     	{
     		enemy.currentSprite++;
     		enemy.facingLeft = 0;
@@ -574,7 +696,7 @@ int main( int argc, char* args[] )
       			enemy.facingLeft = 1;
 			}
 		}
-    	else
+    	else if(enemy.facingLeft)
     	{
     		enemy.currentSprite = 4;
     		enemy.facingLeft = !enemy.facingLeft;
@@ -595,7 +717,7 @@ int main( int argc, char* args[] )
     
     //if one kill the the other
     //kill the game
-    if(!enemy.alive || !man.alive)
+    if((!enemy.alive || !man.alive) && globalTime % 179 == 0)
     {
     	if(enemy.alive)
     	{
@@ -620,9 +742,11 @@ int main( int argc, char* args[] )
   SDL_DestroyTexture(backgroundTexture);
   SDL_DestroyTexture(bulletTexture);
   SDL_DestroyTexture(enemy.sheetTexture);
+  SDL_DestroyTexture(particleTexture);
   Mix_FreeChunk(atirando);
 
   removeAllBullets();
+  removeAllParticle();
 
   // Clean up
   SDL_Quit();
